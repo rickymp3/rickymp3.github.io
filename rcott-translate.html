@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RCOTT Translate | co³.one</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #ccc;
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+    
+    /* Navigation */
+    #nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 5vw;
+      background: rgba(0,0,0,0.95);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #222;
+    }
+    
+    #nav a {
+      color: #ff6700;
+      text-decoration: none;
+      font-style: italic;
+      font-size: 1.2rem;
+      transition: filter 0.2s;
+    }
+    
+    #nav a:hover {
+      filter: brightness(1.3);
+    }
+    
+    #nav .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    #nav .nav-links a {
+      color: #666;
+      font-size: 0.9rem;
+      font-style: normal;
+    }
+    
+    #nav .nav-links a:hover {
+      color: #ff6700;
+    }
+    
+    /* Main container */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 8rem 5vw 4rem;
+    }
+    
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      color: #ff6700;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tagline {
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 3rem;
+    }
+    
+    /* Field selector */
+    .field-selector {
+      margin-bottom: 3rem;
+    }
+    
+    .field-selector label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: #888;
+    }
+    
+    .field-selector select {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-family: Georgia, serif;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff6700' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      transition: border-color 0.2s;
+    }
+    
+    .field-selector select:hover,
+    .field-selector select:focus {
+      border-color: #ff6700;
+      outline: none;
+    }
+    
+    /* Translation cards */
+    .translation-container {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .translation-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .field-context {
+      background: rgba(255, 103, 0, 0.08);
+      border-left: 3px solid #ff6700;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .field-context h2 {
+      color: #ff6700;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .field-context p {
+      color: #aaa;
+    }
+    
+    .concept-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    
+    .concept-card:hover {
+      border-color: #333;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .concept-card .formal {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .concept-card .symbol {
+      font-family: 'Courier New', monospace;
+      font-size: 1.4rem;
+      color: #ff6700;
+      background: rgba(255, 103, 0, 0.1);
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+    }
+    
+    .concept-card .arrow {
+      color: #444;
+      font-size: 1.2rem;
+    }
+    
+    .concept-card .translated-term {
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: normal;
+    }
+    
+    .concept-card .explanation {
+      color: #999;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    
+    .concept-card .example {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #888;
+      border-left: 2px solid #333;
+    }
+    
+    .concept-card .example strong {
+      color: #ff6700;
+      font-weight: normal;
+    }
+    
+    /* The big idea section */
+    .big-idea {
+      background: linear-gradient(135deg, rgba(255, 103, 0, 0.1) 0%, rgba(0,0,0,0) 100%);
+      border: 1px solid #ff6700;
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+    
+    .big-idea h3 {
+      color: #ff6700;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+    
+    .big-idea p {
+      font-size: 1.3rem;
+      color: #fff;
+      line-height: 1.6;
+    }
+    
+    /* Failure modes */
+    .failure-modes {
+      margin-top: 3rem;
+    }
+    
+    .failure-modes h3 {
+      color: #ff6700;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .failure-card {
+      background: rgba(255, 50, 50, 0.05);
+      border: 1px solid rgba(255, 50, 50, 0.2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .failure-card h4 {
+      color: #ff6666;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .failure-card p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+    
+    /* Links section */
+    .links-section {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid #222;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .links-section a {
+      padding: 0.8rem 1.5rem;
+      border: 1px solid #333;
+      color: #888;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .links-section a:hover {
+      border-color: #ff6700;
+      color: #ff6700;
+    }
+    
+    /* Placeholder state */
+    .placeholder {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #444;
+    }
+    
+    .placeholder .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Footer */
+    footer {
+      padding: 4rem 5vw;
+      text-align: center;
+      color: #444;
+      border-top: 1px solid #1a1a1a;
+    }
+    
+    footer a {
+      color: #ff6700;
+      text-decoration: none;
+    }
+    
+    @media (max-width: 768px) {
+      main {
+        padding: 6rem 5vw 3rem;
+      }
+      
+      .concept-card {
+        padding: 1.5rem;
+      }
+      
+      #nav .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav">
+    <a href="index.html">Co³</a>
+    <div class="nav-links">
+      <a href="rcott.html">Full Theory</a>
+      <a href="index.html">Home</a>
+    </div>
+  </nav>
+
+  <main>
+    <h1>RCOTT Translate</h1>
+    <p class="tagline">The same framework, in terms you already use.</p>
+    
+    <div class="field-selector">
+      <label>I work in...</label>
+      <select id="field-select">
+        <option value="">Select your field</option>
+        <option value="startup">Startups / Entrepreneurship</option>
+        <option value="therapy">Therapy / Mental Health</option>
+        <option value="finance">Finance / Investing</option>
+        <option value="engineering">Engineering / Systems Design</option>
+        <option value="medicine">Medicine / Healthcare</option>
+        <option value="education">Education / Teaching</option>
+        <option value="creative">Creative / Arts</option>
+        <option value="sports">Sports / Athletics</option>
+        <option value="parenting">Parenting / Caregiving</option>
+        <option value="management">Management / Leadership</option>
+        <option value="relationships">Relationships / Social</option>
+        <option value="everyday">Everyday Life</option>
+      </select>
+    </div>
+    
+    <div id="placeholder" class="placeholder">
+      <div class="icon">↑</div>
+      <p>Choose your field to see RCOTT in your language</p>
+    </div>
+    
+    <div id="translation" class="translation-container"></div>
+  </main>
+
+  <footer>
+    <p><a href="index.html">← Back to co³.one</a></p>
+  </footer>
+
+  <script>
+    const translations = {
+      startup: {
+        context: {
+          title: "For Founders & Entrepreneurs",
+          description: "You're navigating uncertainty, managing burn rate, and trying to find product-market fit while keeping the lights on."
+        },
+        bigIdea: "Don't optimize for growth—optimize for survival long enough to find what works. The startups that win aren't the ones that move fastest; they're the ones that stay alive long enough to get lucky.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Your Runway",
+            explanation: "The set of moves you can actually make given your current cash, team, and market position. This shrinks every month.",
+            example: "At 18 months runway, you can pivot. At 3 months, you're locked into whatever's already working."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "The Death Zone",
+            explanation: "Zero cash. Key person quits. Legal shutdown. The boundary where your options collapse to nothing.",
+            example: "Every decision that feels urgent is probably pushing you toward an edge you can't see yet."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Margin / Buffer",
+            explanation: "How much room you have before you hit a wall. More runway = more margin. Diversified revenue = more margin. Key person redundancy = more margin.",
+            example: "The founders who seem 'lucky' usually just maintained enough margin to survive their mistakes."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Product-Market Coherence",
+            explanation: "How well your product, market, team, and business model fit together. High coherence = things compound. Low coherence = constant firefighting.",
+            example: "Retention is a coherence signal. If users keep coming back, something's working. If they don't, no amount of growth hacking saves you."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Momentum / Trend",
+            explanation: "Is your coherence improving or degrading? Growing but chaotic is worse than smaller but tightening.",
+            example: "Week-over-week retention trending up matters more than absolute numbers. It means you're learning."
+          },
+          {
+            symbol: "Π",
+            term: "Your Pitch / Story",
+            explanation: "How you translate your actual state into something investors, customers, and employees can understand and buy into.",
+            example: "The best founders are great translators—they make complex internal reality legible to different audiences."
+          }
+        ],
+        failures: [
+          {
+            title: "Premature Scaling",
+            description: "Growing fast while margins are thin. Feels like winning until one bad quarter reveals you were always inches from the edge."
+          },
+          {
+            title: "The Slow Bleed",
+            description: "Small coherence losses that seem fine month-to-month. Then suddenly nothing works and you can't figure out when it broke."
+          }
+        ]
+      },
+      therapy: {
+        context: {
+          title: "For Therapists & Counselors",
+          description: "You help people navigate emotional complexity, build resilience, and find sustainable ways of being."
+        },
+        bigIdea: "Mental health isn't about feeling good—it's about maintaining enough stability to keep moving through whatever comes. The goal isn't to eliminate distress; it's to stay far enough from collapse that you can process it.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Window of Tolerance",
+            explanation: "The emotional and cognitive range where someone can still function, make decisions, and engage with difficulty without shutting down or exploding.",
+            example: "A client in their window can talk about hard things. Outside it, they dissociate, rage, or freeze."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Breakdown Threshold",
+            explanation: "The edge where coping fails—panic attacks, dissociation, self-harm, substance use, complete withdrawal.",
+            example: "The goal isn't to never approach the edge. It's to know where it is and not accidentally fall off."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Emotional Buffer",
+            explanation: "How much capacity someone has before they hit their limit. Sleep, support systems, routines, and skills all build buffer.",
+            example: "A client with strong friendships and good sleep can handle a job loss. Without those buffers, the same event triggers crisis."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Internal Coherence",
+            explanation: "How integrated someone's sense of self is. Can they hold contradictions? Do their values, actions, and feelings align?",
+            example: "Trauma fragments coherence. Integration work is literally rebuilding the ability to be one continuous self."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Healing Trajectory",
+            explanation: "Is coherence building or fragmenting over time? Progress isn't linear, but the trend matters.",
+            example: "A hard session that temporarily destabilizes can be positive if the overall trajectory is toward integration."
+          },
+          {
+            symbol: "Π",
+            term: "Narrative / Self-Story",
+            explanation: "How someone makes sense of their experience. The story they tell about who they are and why.",
+            example: "Therapy often works by helping someone translate chaotic internal experience into a coherent, livable narrative."
+          }
+        ],
+        failures: [
+          {
+            title: "Premature Exposure",
+            description: "Processing trauma before enough buffer exists. Feels like progress until the client decompensates."
+          },
+          {
+            title: "Chronic Low Margin",
+            description: "Functioning but always one bad day from crisis. Looks stable but has no room for anything unexpected."
+          }
+        ]
+      },
+      finance: {
+        context: {
+          title: "For Finance & Investing",
+          description: "You manage risk, allocate capital, and try to grow wealth without blowing up."
+        },
+        bigIdea: "The best investors aren't the ones who maximize returns—they're the ones who stay in the game long enough for compounding to work. Survival is the strategy; returns are the side effect.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Feasible Positions",
+            explanation: "The set of portfolio states you can hold given your capital, margin requirements, and risk limits.",
+            example: "With $100k and 2x leverage limit, your feasible set is different than with $10M and prime brokerage."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Margin Call / Ruin",
+            explanation: "The boundary where you're forced to liquidate, default, or exit the market entirely.",
+            example: "Every blowup in history crossed this boundary. LTCM, Archegos, FTX—all thought they were far from the edge."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Risk Buffer",
+            explanation: "How much you can lose before forced liquidation. Kelly Criterion is essentially optimizing this.",
+            example: "Position sizing is choosing your distance from the edge. Too close = one bad week ends you."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Portfolio Coherence",
+            explanation: "How well your positions work together. Correlated bets reduce coherence. True diversification builds it.",
+            example: "A 'diversified' portfolio of tech stocks isn't coherent—it's one bet wearing multiple hats."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Risk Trend",
+            explanation: "Is your risk profile improving or degrading? Correlations spiking? Liquidity thinning?",
+            example: "March 2020: everything suddenly correlated. Coherence collapsed across asset classes simultaneously."
+          },
+          {
+            symbol: "Π",
+            term: "Reporting / Marks",
+            explanation: "How you translate actual portfolio state into reported numbers. Mark-to-market vs mark-to-model.",
+            example: "Illiquid assets are translation problems—the 'true' state is uncertain until you try to exit."
+          }
+        ],
+        failures: [
+          {
+            title: "Leveraged Concentration",
+            description: "High conviction + high leverage. Maximizes returns until the one scenario you didn't model."
+          },
+          {
+            title: "Liquidity Illusion",
+            description: "Positions that look liquid in normal markets but become untradeable in stress. Your margin was always a mirage."
+          }
+        ]
+      },
+      engineering: {
+        context: {
+          title: "For Engineers & Systems Designers",
+          description: "You build things that need to work reliably under varying conditions and unexpected loads."
+        },
+        bigIdea: "Good engineering isn't about building the most powerful system—it's about building systems that fail gracefully and recover automatically. Robustness beats performance.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Operating Envelope",
+            explanation: "The range of conditions where your system functions correctly. Temperature, load, input ranges, resource availability.",
+            example: "Your API works great at 100 req/s. What about 10,000? What about malformed inputs? What about when the DB is slow?"
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Failure Boundary",
+            explanation: "Where the system breaks—crashes, corrupts data, becomes unresponsive, or produces wrong outputs.",
+            example: "Memory exhaustion. Deadlock. Cascading failures. The edges where 'working' becomes 'not working.'"
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Safety Margin",
+            explanation: "How much headroom you have before hitting limits. Capacity planning is margin planning.",
+            example: "Running at 90% CPU is fine until a traffic spike. Running at 50% gives you room to absorb surprises."
+          },
+          {
+            symbol: "C_Δ",
+            term: "System Coherence",
+            explanation: "How well components work together. Clean interfaces, consistent state, predictable behavior.",
+            example: "Technical debt is accumulated incoherence. Each shortcut makes the system harder to reason about."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Code Health Trend",
+            explanation: "Is the codebase getting cleaner or messier? Are bugs increasing or decreasing? Is onboarding getting easier or harder?",
+            example: "Velocity metrics lie. Coherence trend tells you if you're building on solid ground or quicksand."
+          },
+          {
+            symbol: "Π",
+            term: "Abstraction / API",
+            explanation: "How internal complexity gets translated into usable interfaces. The map your users see.",
+            example: "A good API hides implementation details while exposing the right controls. Bad APIs leak internals or hide necessary information."
+          }
+        ],
+        failures: [
+          {
+            title: "Capacity Blindness",
+            description: "System works perfectly until it doesn't. No graceful degradation, just cliff-edge failure at the boundary."
+          },
+          {
+            title: "Coherence Rot",
+            description: "Each feature adds complexity. Each hack adds confusion. Then one day nobody can change anything safely."
+          }
+        ]
+      },
+      medicine: {
+        context: {
+          title: "For Healthcare Providers",
+          description: "You help bodies and minds maintain function, recover from insults, and navigate the boundary between health and disease."
+        },
+        bigIdea: "Health isn't the absence of disease—it's maintaining enough physiological reserve to handle whatever comes next. Treatment is about restoring margin, not achieving perfection.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Physiological Reserve",
+            explanation: "The range of states a body can maintain while still functioning. Organ capacity, homeostatic range, compensatory mechanisms.",
+            example: "A healthy 30-year-old can lose a liter of blood and compensate. A frail 80-year-old with CHF has almost no reserve."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Decompensation Threshold",
+            explanation: "Where compensatory mechanisms fail. Shock, organ failure, death.",
+            example: "The patient 'looked fine' until they suddenly coded. They were compensating until they couldn't."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Physiological Margin",
+            explanation: "How much stress the body can absorb before systems fail. Frailty is low margin.",
+            example: "Prehabilitation before surgery builds margin. The surgery isn't safer; the patient is further from the edge."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Homeostatic Coherence",
+            explanation: "How well organ systems are working together. Integrated function vs fragmented compensation.",
+            example: "Multi-organ dysfunction is loss of coherence. Each system failing in ways that stress the others."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Clinical Trajectory",
+            explanation: "Is the patient improving or declining? Trend matters more than snapshot.",
+            example: "A bad-looking patient who's improving is different from a good-looking patient who's declining. Watch the trend."
+          },
+          {
+            symbol: "Π",
+            term: "Diagnosis / Prognosis",
+            explanation: "How you translate complex physiology into communicable categories. The map that guides treatment.",
+            example: "Every diagnosis is a translation. 'Sepsis' collapses a complex reality into an actionable category."
+          }
+        ],
+        failures: [
+          {
+            title: "Occult Decompensation",
+            description: "Patient compensating well until sudden collapse. The margin was gone before anyone noticed."
+          },
+          {
+            title: "Iatrogenic Cascade",
+            description: "Treatment that solves one problem while creating another. Each intervention pushes toward a different edge."
+          }
+        ]
+      },
+      education: {
+        context: {
+          title: "For Educators & Teachers",
+          description: "You help people learn, grow, and develop capabilities they'll carry forward."
+        },
+        bigIdea: "Learning isn't about information transfer—it's about expanding what's possible for the learner while keeping them in a zone where growth can actually happen. Push too hard and they shut down. Too soft and nothing changes.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Zone of Proximal Development",
+            explanation: "What the student can engage with given their current knowledge, skills, and support. The learnable space.",
+            example: "Algebra is in the zone for a student who has arithmetic. It's outside for one who doesn't have number sense yet."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Frustration / Shutdown Point",
+            explanation: "Where learning stops—either from overwhelm (too hard) or boredom (too easy).",
+            example: "The glazed eyes. The acting out. The 'I'm stupid.' All signals they've hit a boundary."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Productive Struggle Zone",
+            explanation: "The sweet spot—challenged but not overwhelmed. Enough difficulty to grow, enough support to not collapse.",
+            example: "Scaffolding creates margin. Remove supports as margin builds, not before."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Conceptual Coherence",
+            explanation: "How well new learning connects to what they already know. Integrated understanding vs isolated facts.",
+            example: "Memorizing formulas without understanding is low coherence. Connecting math to physical intuition builds it."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Learning Trajectory",
+            explanation: "Is understanding deepening or fragmenting? Are connections forming or breaking?",
+            example: "Test scores can rise while coherence falls—they're memorizing better, not understanding more."
+          },
+          {
+            symbol: "Π",
+            term: "Assessment / Grades",
+            explanation: "How you translate actual learning into communicable signals. The map that (imperfectly) represents the territory.",
+            example: "Every grade is a translation. It collapses complex capability into a simple signal that may or may not capture what matters."
+          }
+        ],
+        failures: [
+          {
+            title: "Teaching to the Test",
+            description: "Optimizing Π (grades) at the expense of C (actual coherence). Looks like learning until they face something novel."
+          },
+          {
+            title: "Premature Advancement",
+            description: "Moving forward before foundations are solid. Each new layer is built on sand. Eventually it all collapses."
+          }
+        ]
+      },
+      creative: {
+        context: {
+          title: "For Creatives & Artists",
+          description: "You make things that didn't exist before, navigating the tension between vision and execution."
+        },
+        bigIdea: "Creative work isn't about waiting for inspiration—it's about maintaining enough structure to keep working while leaving enough space for surprise. Too rigid and it's dead. Too loose and it never coheres.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Creative Possibility Space",
+            explanation: "What you can actually make given your skills, tools, time, and constraints. The set of achievable works.",
+            example: "A songwriter with guitar skills and studio access has different possibilities than one with just a phone voice memo."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Creative Block / Burnout",
+            explanation: "Where making becomes impossible. Paralysis, exhaustion, or the point where nothing feels worth doing.",
+            example: "Every creative knows this edge. Sometimes it's fear, sometimes depletion, sometimes loss of meaning."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Creative Reserve",
+            explanation: "How much capacity you have for the work. Energy, inspiration, financial runway, emotional bandwidth.",
+            example: "A day job creates margin for creative risk. No margin means every project has to 'work' commercially."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Aesthetic Coherence",
+            explanation: "How well the elements of your work hold together. Does it feel like one thing or fragments stitched together?",
+            example: "A great album has coherence—songs that belong together. A weak one feels like a playlist of unrelated tracks."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Creative Momentum",
+            explanation: "Is the work coming together or falling apart? Is your vision clarifying or fragmenting?",
+            example: "Good creative days feel like emergence—things connecting unexpectedly. Bad ones feel like entropy."
+          },
+          {
+            symbol: "Π",
+            term: "Publication / Release",
+            explanation: "How you translate the work into something audiences can receive. The edit, the frame, the context.",
+            example: "The final mix is a translation. The gallery presentation is a translation. Something is always lost and gained."
+          }
+        ],
+        failures: [
+          {
+            title: "Perfectionist Paralysis",
+            description: "Margin so thin that nothing feels safe to release. The work never ships because it's never 'ready.'"
+          },
+          {
+            title: "Coherence Drift",
+            description: "Starting with vision, then compromising piece by piece until it's unrecognizable. The frog in boiling water of creative work."
+          }
+        ]
+      },
+      sports: {
+        context: {
+          title: "For Athletes & Coaches",
+          description: "You develop physical and mental performance while managing the risk of injury and burnout."
+        },
+        bigIdea: "Peak performance isn't about training harder—it's about training right at the edge of what you can recover from, consistently, without breaking down. Longevity is the ultimate metric.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Training Capacity",
+            explanation: "What your body can handle given current fitness, recovery status, and life stress. The set of sustainable training loads.",
+            example: "After a hard week, your capacity is lower. After a deload, it's higher. The number isn't fixed."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Injury / Overtraining Line",
+            explanation: "Where breakdown happens. Stress fractures, torn ligaments, chronic fatigue, mental burnout.",
+            example: "Every injured athlete was pushing toward an edge they couldn't see until they crossed it."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Recovery Buffer",
+            explanation: "How much room you have before overreaching becomes overtraining. Sleep, nutrition, stress management build buffer.",
+            example: "The athletes who stay healthy longest aren't the ones who train hardest—they're the ones who recover best."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Movement Coherence",
+            explanation: "How well everything works together. Mobility, stability, strength, coordination, timing all integrated.",
+            example: "Compensations are incoherence. Your body finds a way to perform, but it's borrowing from somewhere."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Adaptation Trend",
+            explanation: "Are you building fitness or accumulating fatigue? Is movement quality improving or degrading?",
+            example: "PRs while movement quality declines is a warning sign. You're withdrawing from a finite account."
+          },
+          {
+            symbol: "Π",
+            term: "Performance Metrics",
+            explanation: "How you translate complex physical state into trackable numbers. Times, weights, HRV, RPE.",
+            example: "Every metric is partial. The map is never the territory. The athlete who only chases numbers misses signals."
+          }
+        ],
+        failures: [
+          {
+            title: "Overreach Blindness",
+            description: "Performance keeps improving until it suddenly doesn't. You were cannibalizing recovery for results."
+          },
+          {
+            title: "Compensation Cascade",
+            description: "Small imbalance leads to compensation, leads to strain, leads to injury. The body was coherent until it wasn't."
+          }
+        ]
+      },
+      parenting: {
+        context: {
+          title: "For Parents & Caregivers",
+          description: "You're raising humans—trying to keep them safe while helping them grow into who they're becoming."
+        },
+        bigIdea: "Good parenting isn't about optimizing outcomes—it's about maintaining a secure base from which kids can explore. They need to feel safe enough to take risks, not so protected they never learn to handle difficulty.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "What They Can Handle",
+            explanation: "The range of challenges your kid can face given their age, development, support, and current state.",
+            example: "A rested, connected 8-year-old can handle a hard conversation. A tired, disconnected one can't."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Overwhelm / Shutdown",
+            explanation: "Where they hit their limit. Meltdowns, withdrawal, regression, acting out.",
+            example: "Every parent knows this edge. Sometimes you see it coming, sometimes it blindsides you."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Emotional Buffer",
+            explanation: "How much they can absorb before losing it. Connection, sleep, routine, felt safety all build buffer.",
+            example: "Transitions are hard because they deplete buffer. A hard day at school means less margin at home."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Secure Attachment",
+            explanation: "How solid their sense of safety and connection is. Can they trust that you're there? That they're okay?",
+            example: "Kids with secure attachment can explore more freely. They have a stable base to return to."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Connection Trend",
+            explanation: "Is your relationship strengthening or straining? Are they opening up or shutting down over time?",
+            example: "Behavior is a signal. Increasing defiance might mean decreasing connection. Watch the trend."
+          },
+          {
+            symbol: "Π",
+            term: "What They Show You",
+            explanation: "How they translate their inner world into behavior you can see. Kids communicate through action.",
+            example: "'I hate you' often translates to 'I'm overwhelmed and you're safe to be angry at.' Learn to read the translation."
+          }
+        ],
+        failures: [
+          {
+            title: "Overprotection",
+            description: "So much margin they never learn to handle difficulty. Safety becomes fragility."
+          },
+          {
+            title: "Connection Erosion",
+            description: "Small ruptures that don't get repaired. Each one is fine. The accumulation isn't."
+          }
+        ]
+      },
+      management: {
+        context: {
+          title: "For Managers & Leaders",
+          description: "You're responsible for teams—their performance, their growth, and the system they operate in."
+        },
+        bigIdea: "Leadership isn't about driving results—it's about creating conditions where good results become likely. Build the system, maintain the margins, let people do their work.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Team Capacity",
+            explanation: "What your team can actually deliver given current skills, bandwidth, resources, and organizational constraints.",
+            example: "Promising what's outside your team's feasible set isn't ambitious—it's setting everyone up to fail."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Burnout / Attrition Edge",
+            explanation: "Where the team breaks down. Resignations, health issues, quality collapse, toxic dynamics.",
+            example: "Every 'sudden' resignation was brewing for months. The edge was closer than it looked."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Organizational Slack",
+            explanation: "How much buffer the team has. Can they absorb surprises? Handle a crisis without everything falling apart?",
+            example: "Teams running at 100% capacity have no margin for the unexpected. And the unexpected always comes."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Team Coherence",
+            explanation: "How well people work together. Shared understanding, trust, clear roles, aligned incentives.",
+            example: "High-performing teams have high coherence. Everyone knows what others are doing and why."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Team Health Trend",
+            explanation: "Is trust building or eroding? Are processes improving or calcifying? Is communication opening or closing?",
+            example: "Engagement surveys are lagging indicators. By the time scores drop, coherence has been declining for months."
+          },
+          {
+            symbol: "Π",
+            term: "Reporting / Metrics",
+            explanation: "How you translate team reality into dashboards, updates, and performance reviews.",
+            example: "Every metric can be gamed. The map is never the territory. Good managers look past the translation."
+          }
+        ],
+        failures: [
+          {
+            title: "Metric Goodhart",
+            description: "Optimizing dashboards while coherence degrades. Numbers go up until they suddenly don't."
+          },
+          {
+            title: "Accumulated Unspoken",
+            description: "Small issues never addressed. Each one is minor. The buildup becomes a crisis."
+          }
+        ]
+      },
+      relationships: {
+        context: {
+          title: "For Navigating Relationships",
+          description: "You're building and maintaining connections with other humans—friends, partners, family, colleagues."
+        },
+        bigIdea: "Relationships don't fail from big betrayals—they fail from accumulated small ruptures that never get repaired. The goal isn't to avoid conflict; it's to maintain enough trust to work through it.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "What The Relationship Can Hold",
+            explanation: "The range of tensions, disagreements, and difficulties the relationship can handle without breaking.",
+            example: "A new friendship can't hold the same weight as a 20-year one. Act accordingly."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Breaking Point",
+            explanation: "Where the relationship ends or becomes permanently damaged. Betrayal, contempt, unrecoverable breach.",
+            example: "Some things can't be taken back. The closer you get to certain edges, the less room for error."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Trust Buffer",
+            explanation: "How much goodwill and credit exists. Can you have a hard conversation without it becoming existential?",
+            example: "Early relationships have thin margin. You can't spend trust you haven't built."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Relational Coherence",
+            explanation: "How well you understand each other. Shared meaning, accurate models of each other, mutual respect.",
+            example: "Long-term couples finish each other's sentences. That's coherence—you've built a shared map."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Connection Trajectory",
+            explanation: "Are you growing closer or drifting apart? Is understanding deepening or calcifying?",
+            example: "Relationships don't stay static. You're either building coherence or losing it."
+          },
+          {
+            symbol: "Π",
+            term: "Communication",
+            explanation: "How you translate your inner experience into something the other person can receive.",
+            example: "Most fights are translation failures. You meant one thing, they heard another."
+          }
+        ],
+        failures: [
+          {
+            title: "Accumulated Resentment",
+            description: "Small issues stuffed down. Each one is nothing. The total becomes everything."
+          },
+          {
+            title: "Model Obsolescence",
+            description: "You know who they were, not who they are. Coherence drops because the map hasn't updated."
+          }
+        ]
+      },
+      everyday: {
+        context: {
+          title: "For Everyday Life",
+          description: "You're just trying to live—making decisions, managing time, navigating uncertainty like everyone else."
+        },
+        bigIdea: "A good life isn't about maximizing pleasure or achievement—it's about staying far enough from catastrophe that you can enjoy what you have and handle what comes. Don't optimize for peaks; optimize for not crashing.",
+        concepts: [
+          {
+            symbol: "𝔽(t,x)",
+            term: "Your Options",
+            explanation: "What you can actually do given your current money, health, relationships, and commitments.",
+            example: "With savings, you can quit the bad job. Without them, you can't. Options are real, not theoretical."
+          },
+          {
+            symbol: "∂𝔽",
+            term: "Where Things Fall Apart",
+            explanation: "Bankruptcy. Health crisis. Relationship collapse. Job loss. The edges where life gets very hard.",
+            example: "Most people never think about these edges until they're close to one."
+          },
+          {
+            symbol: "d(y,∂𝔽)",
+            term: "Life Buffer",
+            explanation: "Emergency fund. Insurance. Strong relationships. Skills. Health. The margin between you and disaster.",
+            example: "'Boring' financial advice is all about building margin. It's not exciting until you need it."
+          },
+          {
+            symbol: "C_Δ",
+            term: "Life Coherence",
+            explanation: "How well the pieces of your life fit together. Do your job, relationships, health, and values align?",
+            example: "Burnout often comes from incoherence—living in ways that contradict what you actually need."
+          },
+          {
+            symbol: "ḊC_Δ",
+            term: "Life Trajectory",
+            explanation: "Is your life coming together or fragmenting? Are things generally getting better or harder?",
+            example: "Mood follows trajectory. Feeling stuck often means coherence isn't building."
+          },
+          {
+            symbol: "Π",
+            term: "Your Story",
+            explanation: "How you make sense of your life. The narrative you tell yourself about who you are and why.",
+            example: "Depression often involves a story that forecloses possibility. Therapy rewrites the translation."
+          }
+        ],
+        failures: [
+          {
+            title: "Lifestyle Creep",
+            description: "Expenses rising with income. Margin stays constant or shrinks even as things 'improve.'"
+          },
+          {
+            title: "The Drift",
+            description: "Small compromises that add up. You look up one day and don't recognize your life."
+          }
+        ]
+      }
+    };
+    
+    const fieldSelect = document.getElementById('field-select');
+    const placeholder = document.getElementById('placeholder');
+    const translationContainer = document.getElementById('translation');
+    
+    fieldSelect.addEventListener('change', () => {
+      const field = fieldSelect.value;
+      
+      if (!field) {
+        placeholder.style.display = 'block';
+        translationContainer.classList.remove('visible');
+        return;
+      }
+      
+      const t = translations[field];
+      if (!t) return;
+      
+      placeholder.style.display = 'none';
+      
+      let html = `
+        <div class="field-context">
+          <h2>${t.context.title}</h2>
+          <p>${t.context.description}</p>
+        </div>
+        
+        <div class="big-idea">
+          <h3>The Core Insight</h3>
+          <p>${t.bigIdea}</p>
+        </div>
+        
+        <h3 style="color: #888; margin: 2rem 0 1rem;">Key Concepts Translated</h3>
+      `;
+      
+      t.concepts.forEach(c => {
+        html += `
+          <div class="concept-card">
+            <div class="formal">
+              <span class="symbol">${c.symbol}</span>
+              <span class="arrow">→</span>
+              <span class="translated-term">${c.term}</span>
+            </div>
+            <p class="explanation">${c.explanation}</p>
+            <div class="example"><strong>Example:</strong> ${c.example}</div>
+          </div>
+        `;
+      });
+      
+      html += `
+        <div class="failure-modes">
+          <h3>Common Failure Patterns</h3>
+          ${t.failures.map(f => `
+            <div class="failure-card">
+              <h4>${f.title}</h4>
+              <p>${f.description}</p>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="links-section">
+          <a href="rcott.html">Read Full Theory →</a>
+          <a href="index.html">Back to Home</a>
+        </div>
+      `;
+      
+      translationContainer.innerHTML = html;
+      
+      // Trigger animation
+      setTimeout(() => {
+        translationContainer.classList.add('visible');
+      }, 50);
+    });
+  </script>
+</body>
+</html>
