@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>co³.one</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      overflow-x: hidden;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #ccc;
+      line-height: 1.8;
+    }
+    
+    /* Three.js container - always visible */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+    
+    canvas {
+      display: block;
+    }
+    
+    /* Logo - splash screen */
+    #logo-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scaleY(1.35) scale(1);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 20vmin;
+      color: #ff6700;
+      text-shadow: 
+        0.5px 0.5px 0 rgba(255, 255, 255, 0.45),
+        1px 1px 0 rgba(255, 255, 255, 0.35),
+        1.5px 1.5px 0 rgba(255, 255, 255, 0.15);
+      user-select: none;
+      z-index: 20;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      transition: opacity 0.5s ease, filter 0.3s ease;
+    }
+    
+    #logo-text:hover {
+      filter: brightness(1.1);
+    }
+    
+    #logo-text.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    #logo-text sup {
+      font-size: 0.32em;
+      vertical-align: super;
+      margin-left: 0.15em;
+      position: relative;
+      top: -0.35em;
+    }
+    
+    /* Navigation - appears on inner pages */
+    #nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 5vw;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #222;
+      transform: translateY(-100%);
+      transition: transform 0.4s ease;
+    }
+    
+    #nav.visible {
+      transform: translateY(0);
+    }
+    
+    #nav .nav-logo {
+      color: #ff6700;
+      text-decoration: none;
+      font-style: italic;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+    
+    #nav .nav-logo:hover {
+      filter: brightness(1.3);
+    }
+    
+    #nav .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    #nav .nav-links a {
+      color: #666;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    #nav .nav-links a:hover,
+    #nav .nav-links a.active {
+      color: #ff6700;
+    }
+    
+    /* Page container */
+    .page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      padding-top: 70px;
+    }
+    
+    .page.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .page-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 5vw 4rem;
+    }
+    
+    /* About page */
+    #about-page .page-content {
+      padding-top: 3rem;
+    }
+    
+    #about-page h2 {
+      font-size: 2rem;
+      color: #ff6700;
+      font-style: italic;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: filter 0.2s;
+      user-select: none;
+    }
+    
+    #about-page h2:hover {
+      filter: brightness(1.2);
+    }
+    
+    #about-page p {
+      margin-bottom: 1.5rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+    }
+    
+    #about-page a {
+      color: #ff6700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 103, 0, 0.3);
+      transition: border-color 0.2s;
+    }
+    
+    #about-page a:hover {
+      border-color: #ff6700;
+    }
+    
+    .links {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .links a {
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+      border: 1px solid #ff6700 !important;
+      color: #ff6700;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    
+    .links a:hover {
+      background: #ff6700;
+      color: #000;
+    }
+    
+    /* Contact form */
+    .contact-section {
+      margin-top: 3rem;
+      max-width: 500px;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 8px;
+    }
+    
+    .contact-section h3 {
+      font-size: 1.3rem;
+      font-style: italic;
+      color: #ff6700;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      color: #fff;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #ff6700;
+    }
+    
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #666;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    #contact-form button {
+      padding: 0.8rem 2rem;
+      background: transparent;
+      border: 1px solid #ff6700;
+      color: #ff6700;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    
+    #contact-form button:hover {
+      background: #ff6700;
+      color: #000;
+    }
+    
+    /* RCOTT Theory page styles */
+    #rcott-page h1 {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      color: #ff6700;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+    
+    #rcott-page .subtitle {
+      color: #888;
+      margin-bottom: 2rem;
+    }
+    
+    #rcott-page .gating {
+      font-family: 'Courier New', monospace;
+      font-size: 1.3rem;
+      color: #ff6700;
+      padding: 1rem 1.5rem;
+      border: 1px solid #ff6700;
+      display: inline-block;
+      margin-bottom: 2rem;
+    }
+    
+    #rcott-page section {
+      margin: 4rem 0;
+      padding-top: 2rem;
+      border-top: 1px solid #1a1a1a;
+    }
+    
+    #rcott-page section:first-of-type {
+      border-top: none;
+      margin-top: 2rem;
+    }
+    
+    #rcott-page h2 {
+      font-size: 1.6rem;
+      color: #ff6700;
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+    
+    #rcott-page h3 {
+      font-size: 1.2rem;
+      color: #fff;
+      margin: 2rem 0 1rem;
+    }
+    
+    #rcott-page p {
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .math-block {
+      background: rgba(255, 103, 0, 0.05);
+      border-left: 3px solid #ff6700;
+      padding: 1.5rem 2rem;
+      margin: 2rem 0;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+      font-size: 0.95rem;
+      line-height: 2;
+    }
+    
+    .math-block .symbol {
+      color: #ff6700;
+    }
+    
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .symbol-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 4px;
+    }
+    
+    .symbol-item .sym {
+      font-family: 'Courier New', monospace;
+      color: #ff6700;
+      font-size: 1rem;
+      min-width: 80px;
+    }
+    
+    .symbol-item .def {
+      color: #888;
+      font-size: 0.9rem;
+    }
+    
+    /* Invariant checklist */
+    .invariant-list {
+      margin: 2rem 0;
+    }
+    
+    .invariant-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      background: rgba(255,255,255,0.02);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .invariant-item:hover {
+      background: rgba(255, 103, 0, 0.1);
+    }
+    
+    .invariant-item .check {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #444;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    
+    .invariant-item.checked .check {
+      background: #ff6700;
+      border-color: #ff6700;
+    }
+    
+    .invariant-item .check::after {
+      content: '✓';
+      color: #000;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .invariant-item.checked .check::after {
+      opacity: 1;
+    }
+    
+    .gate-result {
+      font-family: 'Courier New', monospace;
+      font-size: 1.3rem;
+      text-align: center;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border: 2px solid #333;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .gate-result.pass {
+      border-color: #ff6700;
+      color: #ff6700;
+    }
+    
+    .gate-result.fail {
+      border-color: #444;
+      color: #444;
+    }
+    
+    /* Domain tabs */
+    .domain-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin: 2rem 0 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .domain-tab {
+      padding: 0.6rem 1.2rem;
+      background: transparent;
+      border: 1px solid #333;
+      color: #666;
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .domain-tab:hover {
+      border-color: #ff6700;
+      color: #ff6700;
+    }
+    
+    .domain-tab.active {
+      background: #ff6700;
+      border-color: #ff6700;
+      color: #000;
+    }
+    
+    .domain-content {
+      display: none;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+    }
+    
+    .domain-content.active {
+      display: block;
+    }
+    
+    .domain-content h4 {
+      color: #ff6700;
+      margin-bottom: 1rem;
+    }
+    
+    .domain-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    
+    .domain-content td {
+      padding: 0.6rem;
+      border-bottom: 1px solid #222;
+      font-size: 0.9rem;
+    }
+    
+    .domain-content td:first-child {
+      color: #ff6700;
+      font-family: 'Courier New', monospace;
+      width: 80px;
+    }
+    
+    /* Translate page */
+    #translate-page .page-content {
+      padding-top: 3rem;
+    }
+    
+    #translate-page h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      color: #ff6700;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+    
+    #translate-page .tagline {
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .field-selector {
+      margin-bottom: 2rem;
+    }
+    
+    .field-selector label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: #888;
+    }
+    
+    .field-selector select {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff6700' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      transition: border-color 0.2s;
+    }
+    
+    .field-selector select:hover,
+    .field-selector select:focus {
+      border-color: #ff6700;
+      outline: none;
+    }
+    
+    .translation-container {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .translation-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .field-context {
+      background: rgba(255, 103, 0, 0.08);
+      border-left: 3px solid #ff6700;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .field-context h2 {
+      color: #ff6700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .field-context p {
+      color: #aaa;
+      margin: 0;
+    }
+    
+    .big-idea {
+      background: linear-gradient(135deg, rgba(255, 103, 0, 0.1) 0%, rgba(0,0,0,0) 100%);
+      border: 1px solid #ff6700;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    
+    .big-idea h3 {
+      color: #ff6700;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+    
+    .big-idea p {
+      font-size: 1.15rem;
+      color: #fff;
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    .concept-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .concept-card:hover {
+      border-color: #333;
+    }
+    
+    .concept-card .formal {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+    }
+    
+    .concept-card .symbol {
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      color: #ff6700;
+      background: rgba(255, 103, 0, 0.1);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    
+    .concept-card .arrow {
+      color: #444;
+    }
+    
+    .concept-card .translated-term {
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    
+    .concept-card .explanation {
+      color: #999;
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .concept-card .example {
+      padding: 0.8rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #888;
+      border-left: 2px solid #333;
+    }
+    
+    .concept-card .example strong {
+      color: #ff6700;
+      font-weight: normal;
+    }
+    
+    .failure-modes h3 {
+      color: #ff6700;
+      font-size: 1.1rem;
+      margin: 2rem 0 1rem;
+    }
+    
+    .failure-card {
+      background: rgba(255, 50, 50, 0.05);
+      border: 1px solid rgba(255, 50, 50, 0.2);
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .failure-card h4 {
+      color: #ff6666;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+    
+    .failure-card p {
+      color: #888;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    .placeholder {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #444;
+    }
+    
+    .placeholder .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      #nav .nav-links {
+        gap: 1rem;
+      }
+      
+      #nav .nav-links a {
+        font-size: 0.8rem;
+      }
+      
+      .symbol-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .domain-tabs {
+        gap: 0.3rem;
+      }
+      
+      .domain-tab {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Three.js background - always visible -->
+  <div id="canvas-container"></div>
+  
+  <!-- Logo for splash -->
+  <div id="logo-text">Co<sup>3</sup></div>
+  
+  <!-- Navigation -->
+  <nav id="nav">
+    <span class="nav-logo" data-page="splash">Co³</span>
+    <div class="nav-links">
+      <a data-page="about">About</a>
+      <a data-page="rcott">Theory</a>
+      <a data-page="translate">Translate</a>
+    </div>
+  </nav>
+  
+  <!-- About Page -->
+  <div id="about-page" class="page">
+    <div class="page-content">
+      <h2 data-page="splash">Coherence Consulting Company</h2>
+      <p>
+        Co³ ONE explores the mathematics of persistence—how systems maintain coherence 
+        by optimizing distance from failure boundaries while preserving internal structure.
+      </p>
+      <p>
+        The framework applies across domains: risk management, organizational design, 
+        AI alignment, personal decision-making. The pattern is the same: sustainable 
+        systems don't maximize gains, they maximize the probability of continued existence.
+      </p>
+      <p>
+        This is the home of <a href="#" data-page="rcott">RCOTT (Restraint Continuity Observation Translation Theory)</a> and related work.
+      </p>
+      <p>
+        <a href="#" data-page="translate">→ See RCOTT in your field's language</a>
+      </p>
+      
+      <div class="links">
+        <a href="https://substack.com/@co3one" target="_blank">Substack</a>
+        <a href="https://github.com/rickymp3" target="_blank">GitHub</a>
+        <a href="https://www.instagram.com/co3.one" target="_blank">Instagram</a>
+        <a href="https://www.youtube.com/@CO3ONE" target="_blank">YouTube</a>
+      </div>
+      
+      <div class="contact-section">
+        <h3>Contact</h3>
+        <form id="contact-form" action="https://formsubmit.co/founder@co3.one" method="POST">
+          <input type="hidden" name="_captcha" value="true">
+          <input type="hidden" name="_subject" value="Co³ ONE Contact Form">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://co3.one">
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Email" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" placeholder="Message" rows="4" required></textarea>
+          </div>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- RCOTT Theory Page -->
+  <div id="rcott-page" class="page">
+    <div class="page-content">
+      <h1>Restraint Continuity Observation Translation Theory</h1>
+      <p class="subtitle">A 0–1 Pass / "Understood" Gating Framework</p>
+      <div class="gating">G := ∏<sub>m</sub> I<sub>m</sub> ∈ {0, 1}</div>
+      <p style="color: #666;">
+        "1" denotes a binary pass/understood condition: the artifact is internally coherent 
+        under a strict 0–1 rule, without partial credit or hedged scoring.
+      </p>
+      
+      <section>
+        <h2>Foundational Claim</h2>
+        <p>
+          Observed system behavior and its translations are governed by the persistence of 
+          admissible continuations under accumulating restraints. What remains continuous 
+          determines what can move and what can be consistently represented.
+        </p>
+        <p style="color: #ff6700; font-style: italic; font-size: 1.1rem;">
+          Motion and meaning are secondary.
+        </p>
+        
+        <h3>Informal Statement</h3>
+        <p>
+          What happens next, and how it can be described, are whatever stays allowed, 
+          remains stable, and continues to stabilize, while maintaining distance from failure.
+        </p>
+      </section>
+      
+      <section>
+        <h2>Binary Invariants</h2>
+        <p>
+          Validity is structural rather than interpretive. Each invariant is encoded as a binary 
+          indicator I<sub>m</sub> ∈ {0,1}. Click to toggle:
+        </p>
+        
+        <div class="invariant-list">
+          <div class="invariant-item checked" data-inv="1">
+            <div class="check"></div>
+            <div>Sign coherence between prose and optimization direction</div>
+          </div>
+          <div class="invariant-item checked" data-inv="2">
+            <div class="check"></div>
+            <div>Nonempty-domain requirements for infimum or argmin</div>
+          </div>
+          <div class="invariant-item checked" data-inv="3">
+            <div class="check"></div>
+            <div>Explicit declaration and typing of the projection/translation map Π</div>
+          </div>
+          <div class="invariant-item checked" data-inv="4">
+            <div class="check"></div>
+            <div>Sufficient definition of coherence functional C<sub>Δ</sub></div>
+          </div>
+          <div class="invariant-item checked" data-inv="5">
+            <div class="check"></div>
+            <div>Stated convention for boundary edge cases involving ∂𝔽</div>
+          </div>
+        </div>
+        
+        <div class="gate-result pass" id="gate-result">
+          G = 1 × 1 × 1 × 1 × 1 = <strong>1</strong> (PASS)
+        </div>
+      </section>
+      
+      <section>
+        <h2>Mathematical Formulation</h2>
+        
+        <h3>Symbolic Key</h3>
+        <div class="symbol-grid">
+          <div class="symbol-item"><span class="sym">X</span><span class="def">state space</span></div>
+          <div class="symbol-item"><span class="sym">x</span><span class="def">current state</span></div>
+          <div class="symbol-item"><span class="sym">𝔽(t,x)</span><span class="def">feasible continuation set</span></div>
+          <div class="symbol-item"><span class="sym">∂𝔽(t,x)</span><span class="def">feasibility boundary</span></div>
+          <div class="symbol-item"><span class="sym">d(y,∂𝔽)</span><span class="def">margin to violation</span></div>
+          <div class="symbol-item"><span class="sym">C<sub>Δ</sub>(t,y)</span><span class="def">coherence over window Δ</span></div>
+          <div class="symbol-item"><span class="sym">ḊC<sub>Δ</sub>(t,y)</span><span class="def">coherence trend</span></div>
+          <div class="symbol-item"><span class="sym">Π</span><span class="def">projection/translation map</span></div>
+        </div>
+        
+        <h3>Trajectory Rule</h3>
+        <div class="math-block">
+          <span class="symbol">π</span><sub>t+Δt</sub>(x) = <span class="symbol">Π</span>(<br>
+          &nbsp;&nbsp;<span class="symbol">argmin</span><sub>y ∈ 𝔽(t,x)</sub> [<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;d(y, ∂𝔽) − λ·C<sub>Δ</sub>(t,y) − μ·ḊC<sub>Δ</sub>(t,y)<br>
+          &nbsp;&nbsp;]<br>
+          )
+        </div>
+      </section>
+      
+      <section>
+        <h2>Cross-Domain Applications</h2>
+        <p>
+          The framework generalizes by re-instantiating primitives rather than altering the update logic.
+        </p>
+        
+        <div class="domain-tabs">
+          <button class="domain-tab active" data-domain="physics">Physics</button>
+          <button class="domain-tab" data-domain="biology">Biology</button>
+          <button class="domain-tab" data-domain="organizations">Organizations</button>
+          <button class="domain-tab" data-domain="cognition">Cognition</button>
+        </div>
+        
+        <div class="domain-content active" data-domain="physics">
+          <h4>Quantum / Classical Systems</h4>
+          <table>
+            <tr><td>𝔽(t,x)</td><td>Admissible quantum states under environmental coupling</td></tr>
+            <tr><td>∂𝔽</td><td>Decoherence boundary</td></tr>
+            <tr><td>C<sub>Δ</sub></td><td>Persistence of interference-capable correlations</td></tr>
+            <tr><td>Π</td><td>Coarse-graining map producing classical observables</td></tr>
+          </table>
+        </div>
+        
+        <div class="domain-content" data-domain="biology">
+          <h4>Biological Systems</h4>
+          <table>
+            <tr><td>𝔽(t,x)</td><td>Metabolically viable organism states</td></tr>
+            <tr><td>∂𝔽</td><td>Mortality boundary, homeostatic failure</td></tr>
+            <tr><td>C<sub>Δ</sub></td><td>Integrated physiological coherence</td></tr>
+            <tr><td>Π</td><td>Phenotypic expression</td></tr>
+          </table>
+        </div>
+        
+        <div class="domain-content" data-domain="organizations">
+          <h4>Organizational Systems</h4>
+          <table>
+            <tr><td>𝔽(t,x)</td><td>Financially viable configurations</td></tr>
+            <tr><td>∂𝔽</td><td>Insolvency, regulatory violation</td></tr>
+            <tr><td>C<sub>Δ</sub></td><td>Strategic coherence, cultural alignment</td></tr>
+            <tr><td>Π</td><td>External reporting</td></tr>
+          </table>
+        </div>
+        
+        <div class="domain-content" data-domain="cognition">
+          <h4>Cognitive Systems</h4>
+          <table>
+            <tr><td>𝔽(t,x)</td><td>Belief states consistent with evidence</td></tr>
+            <tr><td>∂𝔽</td><td>Logical contradiction threshold</td></tr>
+            <tr><td>C<sub>Δ</sub></td><td>Epistemic integration</td></tr>
+            <tr><td>Π</td><td>Linguistic expression</td></tr>
+          </table>
+        </div>
+      </section>
+      
+      <section>
+        <h2>Failure Modes</h2>
+        <p><strong style="color: #ff6700;">Early failure:</strong> Actions locally acceptable yet too close to the boundary or exhibiting negative coherence trend.</p>
+        <p><strong style="color: #ff6700;">Hindsight suddenness:</strong> Small parameter changes flip the argmin, making discontinuities appear abrupt.</p>
+      </section>
+      
+      <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #222;">
+        <a href="#" data-page="translate" style="color: #ff6700; text-decoration: none;">→ See this in your field's language</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Translate Page -->
+  <div id="translate-page" class="page">
+    <div class="page-content">
+      <h1>RCOTT Translate</h1>
+      <p class="tagline">The same framework, in terms you already use.</p>
+      
+      <div class="field-selector">
+        <label>I work in...</label>
+        <select id="field-select">
+          <option value="">Select your field</option>
+          <option value="startup">Startups / Entrepreneurship</option>
+          <option value="therapy">Therapy / Mental Health</option>
+          <option value="finance">Finance / Investing</option>
+          <option value="engineering">Engineering / Systems Design</option>
+          <option value="medicine">Medicine / Healthcare</option>
+          <option value="education">Education / Teaching</option>
+          <option value="creative">Creative / Arts</option>
+          <option value="sports">Sports / Athletics</option>
+          <option value="parenting">Parenting / Caregiving</option>
+          <option value="management">Management / Leadership</option>
+          <option value="relationships">Relationships / Social</option>
+          <option value="everyday">Everyday Life</option>
+        </select>
+      </div>
+      
+      <div id="placeholder" class="placeholder">
+        <div class="icon">↑</div>
+        <p>Choose your field to see RCOTT in your language</p>
+      </div>
+      
+      <div id="translation" class="translation-container"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ============ THREE.JS BACKGROUND ============
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 12, 0.01);
+    camera.lookAt(0, 0, 0);
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    
+    const gridColor = 0x4a4a4a;
+    const gridRadius = 5;
+    const wellDepth = 3;
+    const wellSharpness = 1.4;
+    
+    let speedMultiplier = 1;
+    let targetSpeed = 1;
+    
+    function calculateWellZ(r) {
+      const normalizedR = r / gridRadius;
+      const z = -wellDepth * Math.pow(1 - normalizedR, wellSharpness) / (normalizedR + 0.1);
+      return Math.max(z, -wellDepth * 3.5);
+    }
+    
+    const numRings = 28;
+    const ringLifespans = [];
+    const ringsGroup = new THREE.Group();
+    
+    for (let i = 0; i < numRings; i++) {
+      ringLifespans.push({
+        progress: i / numRings,
+        baseSpeed: 0.12 + Math.random() * 0.04
+      });
+      
+      const geometry = new THREE.BufferGeometry();
+      const segments = 72;
+      const positions = new Float32Array((segments + 1) * 3);
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      
+      const material = new THREE.LineBasicMaterial({ 
+        color: gridColor,
+        transparent: true,
+        opacity: 0.7
+      });
+      
+      const ring = new THREE.Line(geometry, material);
+      ringsGroup.add(ring);
+    }
+    scene.add(ringsGroup);
+    
+    const numSpokes = 32;
+    const particlesPerSpoke = 6;
+    const spokeParticles = [];
+    const spokesGroup = new THREE.Group();
+    
+    for (let i = 0; i < numSpokes; i++) {
+      const angle = (i / numSpokes) * Math.PI * 2;
+      
+      for (let j = 0; j < particlesPerSpoke; j++) {
+        spokeParticles.push({
+          angle: angle,
+          progress: j / particlesPerSpoke,
+          baseSpeed: 0.1 + Math.random() * 0.06
+        });
+        
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(2 * 3);
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.LineBasicMaterial({
+          color: gridColor,
+          transparent: true,
+          opacity: 0.5
+        });
+        
+        const segment = new THREE.Line(geometry, material);
+        spokesGroup.add(segment);
+      }
+    }
+    scene.add(spokesGroup);
+    
+    const rimGeometry = new THREE.RingGeometry(gridRadius - 0.05, gridRadius + 0.05, 72);
+    const rimMaterial = new THREE.MeshBasicMaterial({ 
+      color: gridColor, 
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.9
+    });
+    const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+    rim.rotation.x = -Math.PI / 2;
+    rim.position.y = 0.01;
+    scene.add(rim);
+    
+    function updateRings(delta) {
+      ringsGroup.children.forEach((ring, i) => {
+        const life = ringLifespans[i];
+        life.progress += delta * life.baseSpeed * speedMultiplier;
+        
+        if (life.progress >= 1) {
+          life.progress = 0;
+          life.baseSpeed = 0.12 + Math.random() * 0.04;
+        }
+        
+        const currentRadius = gridRadius * (1 - life.progress);
+        const fadeStart = 0.65;
+        ring.material.opacity = life.progress > fadeStart 
+          ? 0.7 * (1 - (life.progress - fadeStart) / (1 - fadeStart))
+          : 0.7;
+        
+        const positions = ring.geometry.attributes.position.array;
+        for (let j = 0; j <= 72; j++) {
+          const angle = (j / 72) * Math.PI * 2;
+          positions[j * 3] = Math.cos(angle) * currentRadius;
+          positions[j * 3 + 1] = calculateWellZ(currentRadius);
+          positions[j * 3 + 2] = Math.sin(angle) * currentRadius;
+        }
+        ring.geometry.attributes.position.needsUpdate = true;
+      });
+    }
+    
+    function updateSpokes(delta) {
+      spokesGroup.children.forEach((segment, i) => {
+        const particle = spokeParticles[i];
+        particle.progress += delta * particle.baseSpeed * speedMultiplier;
+        
+        if (particle.progress >= 1) {
+          particle.progress = 0;
+          particle.baseSpeed = 0.1 + Math.random() * 0.06;
+        }
+        
+        const segmentLength = 0.1;
+        const startR = gridRadius * (1 - particle.progress);
+        const endR = gridRadius * (1 - Math.min(particle.progress + segmentLength, 1));
+        
+        const fadeStart = 0.55;
+        segment.material.opacity = particle.progress > fadeStart
+          ? 0.5 * (1 - (particle.progress - fadeStart) / (1 - fadeStart))
+          : 0.5;
+        
+        const positions = segment.geometry.attributes.position.array;
+        positions[0] = Math.cos(particle.angle) * startR;
+        positions[1] = calculateWellZ(startR);
+        positions[2] = Math.sin(particle.angle) * startR;
+        positions[3] = Math.cos(particle.angle) * endR;
+        positions[4] = calculateWellZ(endR);
+        positions[5] = Math.sin(particle.angle) * endR;
+        segment.geometry.attributes.position.needsUpdate = true;
+      });
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      speedMultiplier += (targetSpeed - speedMultiplier) * 0.05;
+      updateRings(0.016);
+      updateSpokes(0.016);
+      renderer.render(scene, camera);
+    }
+    animate();
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // ============ NAVIGATION ============
+    const logoText = document.getElementById('logo-text');
+    const nav = document.getElementById('nav');
+    const pages = document.querySelectorAll('.page');
+    const navLinks = document.querySelectorAll('[data-page]');
+    
+    let currentPage = 'splash';
+    let autoReturnTimer = null;
+    const AUTO_RETURN_MS = 5 * 60 * 1000;
+    
+    function resetAutoReturn() {
+      if (autoReturnTimer) clearTimeout(autoReturnTimer);
+      if (currentPage !== 'splash') {
+        autoReturnTimer = setTimeout(() => navigateTo('splash'), AUTO_RETURN_MS);
+      }
+    }
+    
+    document.addEventListener('mousemove', resetAutoReturn);
+    document.addEventListener('touchstart', resetAutoReturn);
+    document.addEventListener('scroll', resetAutoReturn);
+    
+    function navigateTo(page) {
+      if (page === currentPage) return;
+      
+      // Hyperdrive transition
+      targetSpeed = 25;
+      setTimeout(() => { targetSpeed = currentPage === 'splash' ? 0.5 : 1; }, 600);
+      
+      // Update UI
+      if (page === 'splash') {
+        logoText.classList.remove('hidden');
+        nav.classList.remove('visible');
+        pages.forEach(p => p.classList.remove('active'));
+        if (autoReturnTimer) clearTimeout(autoReturnTimer);
+      } else {
+        logoText.classList.add('hidden');
+        nav.classList.add('visible');
+        pages.forEach(p => p.classList.remove('active'));
+        document.getElementById(page + '-page').classList.add('active');
+        resetAutoReturn();
+      }
+      
+      // Update nav active state
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.dataset.page === page);
+      });
+      
+      currentPage = page;
+      
+      // Scroll to top
+      const activePage = document.querySelector('.page.active');
+      if (activePage) activePage.scrollTop = 0;
+    }
+    
+    // Click handlers
+    logoText.addEventListener('click', () => navigateTo('about'));
+    
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigateTo(link.dataset.page);
+      });
+    });
+    
+    // ============ INVARIANT TOGGLE ============
+    const invariantItems = document.querySelectorAll('.invariant-item');
+    const gateResult = document.getElementById('gate-result');
+    
+    function updateGate() {
+      const values = Array.from(invariantItems).map(item => item.classList.contains('checked') ? 1 : 0);
+      const product = values.reduce((a, b) => a * b, 1);
+      gateResult.innerHTML = `G = ${values.join(' × ')} = <strong>${product}</strong> (${product === 1 ? 'PASS' : 'FAIL'})`;
+      gateResult.className = 'gate-result ' + (product === 1 ? 'pass' : 'fail');
+    }
+    
+    invariantItems.forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('checked');
+        updateGate();
+      });
+    });
+    
+    // ============ DOMAIN TABS ============
+    const domainTabs = document.querySelectorAll('.domain-tab');
+    const domainContents = document.querySelectorAll('.domain-content');
+    
+    domainTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const domain = tab.dataset.domain;
+        domainTabs.forEach(t => t.classList.remove('active'));
+        domainContents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector(`.domain-content[data-domain="${domain}"]`).classList.add('active');
+      });
+    });
+    
+    // ============ TRANSLATE PAGE ============
+    const translations = {
+      startup: {
+        context: { title: "For Founders & Entrepreneurs", description: "You're navigating uncertainty, managing burn rate, and trying to find product-market fit." },
+        bigIdea: "Don't optimize for growth—optimize for survival long enough to find what works. The startups that win aren't the ones that move fastest; they're the ones that stay alive long enough to get lucky.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Your Runway", explanation: "The set of moves you can actually make given your current cash, team, and market position.", example: "At 18 months runway, you can pivot. At 3 months, you're locked in." },
+          { symbol: "∂𝔽", term: "The Death Zone", explanation: "Zero cash. Key person quits. Legal shutdown.", example: "Every decision that feels urgent is probably pushing you toward an edge." },
+          { symbol: "d(y,∂𝔽)", term: "Margin / Buffer", explanation: "How much room you have before you hit a wall.", example: "The founders who seem 'lucky' usually just maintained enough margin to survive their mistakes." },
+          { symbol: "C_Δ", term: "Product-Market Coherence", explanation: "How well your product, market, team, and business model fit together.", example: "Retention is a coherence signal." },
+          { symbol: "Π", term: "Your Pitch", explanation: "How you translate your actual state into something investors can understand.", example: "The best founders are great translators." }
+        ],
+        failures: [
+          { title: "Premature Scaling", description: "Growing fast while margins are thin. Feels like winning until one bad quarter." },
+          { title: "The Slow Bleed", description: "Small coherence losses that seem fine month-to-month." }
+        ]
+      },
+      therapy: {
+        context: { title: "For Therapists & Counselors", description: "You help people navigate emotional complexity and build resilience." },
+        bigIdea: "Mental health isn't about feeling good—it's about maintaining enough stability to keep moving through whatever comes.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Window of Tolerance", explanation: "The emotional range where someone can still function.", example: "A client in their window can talk about hard things." },
+          { symbol: "∂𝔽", term: "Breakdown Threshold", explanation: "The edge where coping fails.", example: "Panic attacks, dissociation, self-harm." },
+          { symbol: "d(y,∂𝔽)", term: "Emotional Buffer", explanation: "How much capacity before they hit their limit.", example: "Sleep, support systems, routines all build buffer." },
+          { symbol: "C_Δ", term: "Internal Coherence", explanation: "How integrated someone's sense of self is.", example: "Trauma fragments coherence." },
+          { symbol: "Π", term: "Narrative", explanation: "How someone makes sense of their experience.", example: "Therapy helps translate chaos into livable narrative." }
+        ],
+        failures: [
+          { title: "Premature Exposure", description: "Processing trauma before enough buffer exists." },
+          { title: "Chronic Low Margin", description: "Functioning but always one bad day from crisis." }
+        ]
+      },
+      finance: {
+        context: { title: "For Finance & Investing", description: "You manage risk, allocate capital, and try to grow wealth without blowing up." },
+        bigIdea: "The best investors stay in the game long enough for compounding to work. Survival is the strategy.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Feasible Positions", explanation: "Portfolio states you can hold given capital and risk limits.", example: "Your feasible set changes with leverage." },
+          { symbol: "∂𝔽", term: "Margin Call / Ruin", explanation: "Where you're forced to liquidate.", example: "LTCM, Archegos, FTX—all crossed this boundary." },
+          { symbol: "d(y,∂𝔽)", term: "Risk Buffer", explanation: "How much you can lose before forced liquidation.", example: "Position sizing is choosing your distance from the edge." },
+          { symbol: "C_Δ", term: "Portfolio Coherence", explanation: "How well positions work together.", example: "True diversification builds coherence." },
+          { symbol: "Π", term: "Marks", explanation: "How you translate portfolio state into reported numbers.", example: "Illiquid assets are translation problems." }
+        ],
+        failures: [
+          { title: "Leveraged Concentration", description: "Maximizes returns until the one scenario you didn't model." },
+          { title: "Liquidity Illusion", description: "Positions that look liquid until stress." }
+        ]
+      },
+      engineering: {
+        context: { title: "For Engineers", description: "You build things that need to work reliably." },
+        bigIdea: "Good engineering is about systems that fail gracefully. Robustness beats performance.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Operating Envelope", explanation: "Conditions where your system functions correctly.", example: "What happens at 10x expected load?" },
+          { symbol: "∂𝔽", term: "Failure Boundary", explanation: "Where the system breaks.", example: "Memory exhaustion, deadlock, cascading failures." },
+          { symbol: "d(y,∂𝔽)", term: "Safety Margin", explanation: "Headroom before hitting limits.", example: "Running at 50% gives room for surprises." },
+          { symbol: "C_Δ", term: "System Coherence", explanation: "How well components work together.", example: "Technical debt is accumulated incoherence." },
+          { symbol: "Π", term: "API", explanation: "How internal complexity becomes usable interface.", example: "Good APIs hide internals, expose right controls." }
+        ],
+        failures: [
+          { title: "Capacity Blindness", description: "No graceful degradation, just cliff-edge failure." },
+          { title: "Coherence Rot", description: "Each hack adds confusion until nothing is safe to change." }
+        ]
+      },
+      medicine: {
+        context: { title: "For Healthcare Providers", description: "You help bodies maintain function and recover from insults." },
+        bigIdea: "Health is maintaining enough physiological reserve to handle whatever comes next.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Physiological Reserve", explanation: "The range of states a body can maintain.", example: "Frail patients have almost no reserve." },
+          { symbol: "∂𝔽", term: "Decompensation", explanation: "Where compensatory mechanisms fail.", example: "They were compensating until they couldn't." },
+          { symbol: "d(y,∂𝔽)", term: "Physiological Margin", explanation: "How much stress the body can absorb.", example: "Prehabilitation builds margin before surgery." },
+          { symbol: "C_Δ", term: "Homeostatic Coherence", explanation: "How well organ systems work together.", example: "Multi-organ dysfunction is loss of coherence." },
+          { symbol: "Π", term: "Diagnosis", explanation: "How you translate physiology into categories.", example: "'Sepsis' collapses complexity into action." }
+        ],
+        failures: [
+          { title: "Occult Decompensation", description: "Patient compensating well until sudden collapse." },
+          { title: "Iatrogenic Cascade", description: "Treatment that solves one problem while creating another." }
+        ]
+      },
+      education: {
+        context: { title: "For Educators", description: "You help people learn and develop capabilities." },
+        bigIdea: "Learning is expanding what's possible while keeping them in a zone where growth can happen.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Zone of Proximal Development", explanation: "What the student can engage with.", example: "Algebra needs arithmetic foundation." },
+          { symbol: "∂𝔽", term: "Frustration Point", explanation: "Where learning stops.", example: "Glazed eyes, acting out, 'I'm stupid.'" },
+          { symbol: "d(y,∂𝔽)", term: "Productive Struggle", explanation: "Challenged but not overwhelmed.", example: "Scaffolding creates margin." },
+          { symbol: "C_Δ", term: "Conceptual Coherence", explanation: "How well new learning connects.", example: "Formulas without understanding = low coherence." },
+          { symbol: "Π", term: "Assessment", explanation: "How you translate learning into signals.", example: "Every grade is a translation." }
+        ],
+        failures: [
+          { title: "Teaching to Test", description: "Optimizing grades at expense of understanding." },
+          { title: "Premature Advancement", description: "Moving forward before foundations are solid." }
+        ]
+      },
+      creative: {
+        context: { title: "For Creatives", description: "You make things that didn't exist before." },
+        bigIdea: "Creative work is maintaining enough structure to keep working while leaving space for surprise.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Possibility Space", explanation: "What you can make given skills and constraints.", example: "Tools shape possibilities." },
+          { symbol: "∂𝔽", term: "Block / Burnout", explanation: "Where making becomes impossible.", example: "Fear, depletion, or loss of meaning." },
+          { symbol: "d(y,∂𝔽)", term: "Creative Reserve", explanation: "Capacity for the work.", example: "Day job creates margin for risk." },
+          { symbol: "C_Δ", term: "Aesthetic Coherence", explanation: "How well elements hold together.", example: "Great albums have coherence." },
+          { symbol: "Π", term: "Release", explanation: "How work becomes receivable.", example: "The final mix is a translation." }
+        ],
+        failures: [
+          { title: "Perfectionist Paralysis", description: "Nothing feels safe to release." },
+          { title: "Coherence Drift", description: "Compromising until it's unrecognizable." }
+        ]
+      },
+      sports: {
+        context: { title: "For Athletes & Coaches", description: "You develop performance while managing injury risk." },
+        bigIdea: "Peak performance is training at the edge of what you can recover from, consistently.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Training Capacity", explanation: "What your body can handle.", example: "Capacity changes with recovery status." },
+          { symbol: "∂𝔽", term: "Injury Line", explanation: "Where breakdown happens.", example: "Every injured athlete crossed an edge." },
+          { symbol: "d(y,∂𝔽)", term: "Recovery Buffer", explanation: "Room before overtraining.", example: "Athletes who stay healthy recover best." },
+          { symbol: "C_Δ", term: "Movement Coherence", explanation: "How everything works together.", example: "Compensations are incoherence." },
+          { symbol: "Π", term: "Metrics", explanation: "How you track physical state.", example: "Every metric is partial." }
+        ],
+        failures: [
+          { title: "Overreach Blindness", description: "Cannibalizing recovery for results." },
+          { title: "Compensation Cascade", description: "Small imbalance leads to injury." }
+        ]
+      },
+      parenting: {
+        context: { title: "For Parents", description: "You're raising humans while keeping them safe." },
+        bigIdea: "Good parenting is maintaining a secure base from which kids can explore.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "What They Can Handle", explanation: "Challenges given age and support.", example: "A rested, connected kid handles more." },
+          { symbol: "∂𝔽", term: "Overwhelm", explanation: "Where they hit their limit.", example: "Meltdowns, withdrawal, regression." },
+          { symbol: "d(y,∂𝔽)", term: "Emotional Buffer", explanation: "How much they can absorb.", example: "Hard day at school = less margin at home." },
+          { symbol: "C_Δ", term: "Secure Attachment", explanation: "Sense of safety and connection.", example: "Secure kids explore more freely." },
+          { symbol: "Π", term: "Behavior", explanation: "How they show their inner world.", example: "'I hate you' = 'I'm overwhelmed.'" }
+        ],
+        failures: [
+          { title: "Overprotection", description: "So much margin they never learn difficulty." },
+          { title: "Connection Erosion", description: "Small ruptures that don't get repaired." }
+        ]
+      },
+      management: {
+        context: { title: "For Managers", description: "You're responsible for teams and their performance." },
+        bigIdea: "Leadership is creating conditions where good results become likely.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Team Capacity", explanation: "What your team can deliver.", example: "Don't promise outside the feasible set." },
+          { symbol: "∂𝔽", term: "Burnout Edge", explanation: "Where the team breaks down.", example: "Every 'sudden' resignation was brewing." },
+          { symbol: "d(y,∂𝔽)", term: "Slack", explanation: "Buffer for surprises.", example: "100% capacity = no margin for unexpected." },
+          { symbol: "C_Δ", term: "Team Coherence", explanation: "How well people work together.", example: "High performers have high coherence." },
+          { symbol: "Π", term: "Metrics", explanation: "How you translate reality into dashboards.", example: "Every metric can be gamed." }
+        ],
+        failures: [
+          { title: "Metric Goodhart", description: "Optimizing dashboards while coherence degrades." },
+          { title: "Accumulated Unspoken", description: "Small issues becoming crisis." }
+        ]
+      },
+      relationships: {
+        context: { title: "For Relationships", description: "You're building connections with other humans." },
+        bigIdea: "Relationships fail from accumulated small ruptures that never get repaired.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "What It Can Hold", explanation: "Tensions the relationship can handle.", example: "New friendships can't hold same weight as old ones." },
+          { symbol: "∂𝔽", term: "Breaking Point", explanation: "Where relationship ends.", example: "Some things can't be taken back." },
+          { symbol: "d(y,∂𝔽)", term: "Trust Buffer", explanation: "Goodwill that exists.", example: "You can't spend trust you haven't built." },
+          { symbol: "C_Δ", term: "Relational Coherence", explanation: "How well you understand each other.", example: "Long couples finish each other's sentences." },
+          { symbol: "Π", term: "Communication", explanation: "How you translate experience.", example: "Most fights are translation failures." }
+        ],
+        failures: [
+          { title: "Accumulated Resentment", description: "Small issues stuffed down." },
+          { title: "Model Obsolescence", description: "You know who they were, not are." }
+        ]
+      },
+      everyday: {
+        context: { title: "For Everyday Life", description: "You're just trying to live and make decisions." },
+        bigIdea: "A good life is staying far enough from catastrophe that you can enjoy what you have.",
+        concepts: [
+          { symbol: "𝔽(t,x)", term: "Your Options", explanation: "What you can actually do.", example: "With savings, you can quit bad job." },
+          { symbol: "∂𝔽", term: "Where Things Fall Apart", explanation: "Bankruptcy, health crisis, relationship collapse.", example: "Most don't think about edges until close." },
+          { symbol: "d(y,∂𝔽)", term: "Life Buffer", explanation: "Emergency fund, insurance, skills, health.", example: "Boring advice is about building margin." },
+          { symbol: "C_Δ", term: "Life Coherence", explanation: "How well pieces fit together.", example: "Burnout often comes from incoherence." },
+          { symbol: "Π", term: "Your Story", explanation: "How you make sense of your life.", example: "Depression involves foreclosing possibility." }
+        ],
+        failures: [
+          { title: "Lifestyle Creep", description: "Expenses rising with income, margin constant." },
+          { title: "The Drift", description: "Small compromises adding up." }
+        ]
+      }
+    };
+    
+    const fieldSelect = document.getElementById('field-select');
+    const placeholder = document.getElementById('placeholder');
+    const translationContainer = document.getElementById('translation');
+    
+    fieldSelect.addEventListener('change', () => {
+      const field = fieldSelect.value;
+      
+      if (!field) {
+        placeholder.style.display = 'block';
+        translationContainer.classList.remove('visible');
+        return;
+      }
+      
+      const t = translations[field];
+      placeholder.style.display = 'none';
+      
+      let html = `
+        <div class="field-context">
+          <h2>${t.context.title}</h2>
+          <p>${t.context.description}</p>
+        </div>
+        <div class="big-idea">
+          <h3>The Core Insight</h3>
+          <p>${t.bigIdea}</p>
+        </div>
+        <h3 style="color: #888; margin: 2rem 0 1rem;">Key Concepts</h3>
+      `;
+      
+      t.concepts.forEach(c => {
+        html += `
+          <div class="concept-card">
+            <div class="formal">
+              <span class="symbol">${c.symbol}</span>
+              <span class="arrow">→</span>
+              <span class="translated-term">${c.term}</span>
+            </div>
+            <p class="explanation">${c.explanation}</p>
+            <div class="example"><strong>Example:</strong> ${c.example}</div>
+          </div>
+        `;
+      });
+      
+      html += `<div class="failure-modes"><h3>Failure Patterns</h3>`;
+      t.failures.forEach(f => {
+        html += `
+          <div class="failure-card">
+            <h4>${f.title}</h4>
+            <p>${f.description}</p>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      
+      translationContainer.innerHTML = html;
+      setTimeout(() => translationContainer.classList.add('visible'), 50);
+    });
+  </script>
+</body>
+</html>
