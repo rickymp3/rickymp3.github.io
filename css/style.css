@@ -115,7 +115,7 @@ input,textarea,select,button{user-select:text;-webkit-user-select:text}
 .bl-tag{
   font-family:var(--fd);font-weight:200;font-size:.48rem;
   color:var(--o);letter-spacing:.2em;text-transform:uppercase;
-  opacity:.7;
+  opacity:.7;margin-top:2px;
 }
 
 /* ═══════════ Navigation ═══════════ */
