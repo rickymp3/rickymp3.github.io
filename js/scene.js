@@ -113,7 +113,7 @@ for (let j = 0; j < LON_COUNT; j++) {
 const whGeo = new THREE.BufferGeometry();
 whGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-const whU = { uAccent: { value: new THREE.Vector3(1, 0.404, 0) } };
+const whU = { uAccent: { value: new THREE.Vector3(0.35, 0.35, 0.35) } };
 const whMat = new THREE.ShaderMaterial({
   transparent: true,
   uniforms: whU,
@@ -181,9 +181,7 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.getElapsedTime();
 
-  // Color lerp
-  accent.lerp(aTgt, dt * 1.5);
-  whU.uAccent.value.set(accent.r, accent.g, accent.b);
+  // Wormhole stays gray — not in color lerp system
 
   // Wormhole slow rotation
   wormhole.rotation.y += dt * 0.02;
