@@ -28,7 +28,7 @@ function go(idx) {
 
   // Transition flash
   const flash = document.querySelector('.transition-flash');
-  if (flash) { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 400); }
+  if (flash) { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 250); }
 
   // Camera + color
   if (window.co3Scene) window.co3Scene.setState(name);
@@ -47,12 +47,12 @@ function go(idx) {
     a.classList.toggle('active', a.dataset.page === name)
   );
 
-  // Activate page content
+  // Activate page content — after old page has fully cleared
   cur = idx;
   setTimeout(() => {
     const el = document.getElementById(name);
     if (el) el.classList.add('active');
-  }, name === 'home' ? 400 : 800);
+  }, name === 'home' ? 300 : 500);
 
   // URL
   history.replaceState(null, null, name === 'home' ? '#' : '#' + name);
