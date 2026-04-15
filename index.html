@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>CO3 ONE</title>
   <meta name="description" content="Constraint-aware intelligence.">
-  <meta name="theme-color" content="#08080e">
+  <meta name="theme-color" content="#0a0a10">
   <meta property="og:title" content="CO3 ONE">
   <meta property="og:description" content="Constraint-aware intelligence.">
   <meta property="og:image" content="https://co3.one/img/og-image.png">
@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <meta name="msapplication-TileColor" content="#08080e">
+  <meta name="msapplication-TileColor" content="#0a0a10">
   <meta name="msapplication-TileImage" content="img/mstile-150x150.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -36,22 +36,23 @@
 </head>
 <body>
 
-  <!-- Scene -->
   <div id="scene-container"></div>
-
-  <!-- 60s film overlays -->
   <div class="ov-vignette"></div>
   <div class="ov-grain"></div>
   <div class="ov-flicker"></div>
   <div class="ov-scratch"></div>
 
-  <!-- Tagline — persistent, repositions per page -->
-  <div class="tagline">Constraint-aware intelligence</div>
+  <!-- Logo — centered on home, fades on navigate -->
+  <div class="hero-logo visible">
+    <img src="img/co3-mark-circle.png" alt="CO3 ONE" draggable="false">
+  </div>
 
-  <!-- Transition -->
+  <!-- Tagline — repositions per page -->
+  <div class="tagline home">Constraint-aware intelligence</div>
+
   <div class="transition-flash"></div>
 
-  <!-- HOME — empty, logo is in 3D scene -->
+  <!-- HOME -->
   <div id="home" class="page"></div>
 
   <!-- PRODUCT -->
@@ -102,27 +103,27 @@
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_next" value="https://co3.one">
         <div class="c-field rv">
+          <label>Topic</label>
           <select name="topic" required>
-            <option value="" disabled selected></option>
+            <option value="" disabled selected>Select a topic</option>
             <option value="general">General inquiry</option>
             <option value="partnership">Partnership</option>
             <option value="press">Press / media</option>
             <option value="investment">Investment</option>
             <option value="other">Other</option>
           </select>
-          <label>Topic</label>
         </div>
         <div class="c-field rv">
-          <input type="text" name="name" placeholder=" " required>
           <label>Name</label>
+          <input type="text" name="name" placeholder="Your name" required>
         </div>
         <div class="c-field rv">
-          <input type="email" name="email" placeholder=" " required>
           <label>Email</label>
+          <input type="email" name="email" placeholder="your@email.com" required>
         </div>
         <div class="c-field rv">
-          <textarea name="message" placeholder=" " rows="2" required></textarea>
           <label>Message</label>
+          <textarea name="message" placeholder="How can we help?" rows="3" required></textarea>
         </div>
         <div class="c-submit rv">
           <button type="submit">Send</button>
@@ -151,7 +152,6 @@
     </div>
   </div>
 
-  <!-- Navigation -->
   <nav>
     <a href="#" data-page="home">Home</a>
     <a href="#product" data-page="product">Product</a>
@@ -159,14 +159,12 @@
     <a href="#contact" data-page="contact">Contact</a>
   </nav>
 
-  <!-- Footer -->
   <div class="footer">
     <a href="https://www.miji.one" target="_blank" rel="noopener">miji.one</a> · <a href="brand.html">brand</a><br>
     &copy; 2026 CO3 ONE INC. &middot; CO3 ONE LLC<br>
     Delaware Public Benefit Corporation
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/scene.js"></script>
   <script src="js/app.js"></script>
