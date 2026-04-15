@@ -10,11 +10,17 @@ let cur = 0, locked = false;
 const LOCK = 2000;
 const tagline = document.querySelector('.tagline');
 const heroLogo = document.querySelector('.hero-logo');
+const brandLine = document.getElementById('brandLine');
+const swipeHint = document.getElementById('swipeHint');
 
 function go(idx) {
   if (locked || idx === cur || idx < 0 || idx >= pages.length) return;
   locked = true;
   const name = pages[idx];
+  const isHome = name === 'home';
+
+  // Hide swipe hint on first navigation
+  if (swipeHint) swipeHint.classList.add('hidden');
 
   // Deactivate current page
   const prevEl = document.getElementById(pages[cur]);
@@ -28,13 +34,13 @@ function go(idx) {
   if (window.co3Scene) window.co3Scene.setState(name);
 
   // Logo: visible on home, fades on everything else
-  if (heroLogo) heroLogo.classList.toggle('visible', name === 'home');
+  if (heroLogo) heroLogo.classList.toggle('visible', isHome);
 
-  // Tagline: prominent on home, whisper elsewhere
-  if (tagline) {
-    tagline.classList.remove('home', 'aside');
-    tagline.classList.add(name === 'home' ? 'home' : 'aside');
-  }
+  // Tagline (centered): visible on home only
+  if (tagline) tagline.classList.toggle('visible', isHome);
+
+  // Brand line (top-left): visible on non-home pages
+  if (brandLine) brandLine.classList.toggle('visible', !isHome);
 
   // Nav active
   document.querySelectorAll('nav a').forEach(a =>
@@ -101,12 +107,14 @@ function init() {
     if (window.co3Scene) window.co3Scene.setState(pages[i]);
     document.getElementById(pages[i]).classList.add('active');
     document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.dataset.page === pages[i]));
-    if (tagline) { tagline.classList.remove('home'); tagline.classList.add('aside'); }
+    if (tagline) tagline.classList.remove('visible');
     if (heroLogo) heroLogo.classList.remove('visible');
+    if (brandLine) brandLine.classList.add('visible');
+    if (swipeHint) swipeHint.classList.add('hidden');
   } else {
     document.getElementById('home').classList.add('active');
     document.querySelector('nav a[data-page="home"]').classList.add('active');
-    if (tagline) tagline.classList.add('home');
+    if (tagline) tagline.classList.add('visible');
   }
 }
 
