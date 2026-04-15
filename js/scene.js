@@ -1,336 +1,230 @@
 /* ═══════════════════════════════════════════════════════════
-   CO3 ONE — Gateway Scene v3
-   Dynamic rings, no radial lines/struts
+   CO3 ONE — Gateway v5 (final synthesis)
+   Smooth rings · Color lerp · Logo in 3D · 2077 alien tech
    ═══════════════════════════════════════════════════════════ */
-
 (function(){
-const O = 0xff6700;
-const isMobile = window.innerWidth < 768;
+const ORANGE=new THREE.Color(0xff6700);
+const GOLD=new THREE.Color(0xC4A265);
+const accent=new THREE.Color().copy(ORANGE);
+const accentTarget=new THREE.Color().copy(ORANGE);
+const M=window.innerWidth<768;
+const TSEG=M?128:256; // tubular segments — SMOOTH
+const RSEG=48; // radial segments — round cross-section
 
-const renderer = new THREE.WebGLRenderer({ antialias:!isMobile, powerPreference:'high-performance' });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile?1.5:2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.85;
-document.getElementById('scene-container').appendChild(renderer.domElement);
+const R=new THREE.WebGLRenderer({antialias:!M,powerPreference:'high-performance'});
+R.setSize(window.innerWidth,window.innerHeight);
+R.setPixelRatio(Math.min(window.devicePixelRatio,M?1.5:2));
+R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=.85;
+document.getElementById('scene-container').appendChild(R.domElement);
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x08080e);
-scene.fog = new THREE.FogExp2(0x08080e, 0.008);
+const S=new THREE.Scene();S.background=new THREE.Color(0x08080e);S.fog=new THREE.FogExp2(0x08080e,.008);
+const cam=new THREE.PerspectiveCamera(55,window.innerWidth/window.innerHeight,.1,500);
 
-const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 500);
-
-// Post-processing
-const pr = Math.min(window.devicePixelRatio, isMobile?1.5:2);
-const rt = new THREE.WebGLRenderTarget(window.innerWidth*pr, window.innerHeight*pr);
-const postScene = new THREE.Scene();
-const postCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-const postMat = new THREE.ShaderMaterial({
+// Post
+const pr=Math.min(window.devicePixelRatio,M?1.5:2);
+const rt=new THREE.WebGLRenderTarget(window.innerWidth*pr,window.innerHeight*pr);
+const pS=new THREE.Scene(),pC=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const pM=new THREE.ShaderMaterial({
   uniforms:{tDiffuse:{value:null},uTime:{value:0},uRes:{value:new THREE.Vector2(window.innerWidth,window.innerHeight)}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,1.0);}',
-  fragmentShader:`
-    uniform sampler2D tDiffuse;uniform float uTime;uniform vec2 uRes;varying vec2 vUv;
-    void main(){
-      vec2 uv=vUv;
-      vec2 c=uv-.5;uv+=c*dot(c,c)*.02;
-      float ca=.0012*length(uv-.5);
-      float r=texture2D(tDiffuse,uv+vec2(ca,0)).r;
-      float g=texture2D(tDiffuse,uv).g;
-      float b=texture2D(tDiffuse,uv-vec2(ca,0)).b;
-      vec3 col=vec3(r,g,b);
-      vec3 bl=vec3(0);float bs=3./uRes.x;
-      for(float i=-2.;i<=2.;i++)for(float j=-2.;j<=2.;j++){
-        vec3 s=texture2D(tDiffuse,uv+vec2(i,j)*bs).rgb;
-        bl+=s*smoothstep(.12,.6,dot(s,vec3(.2126,.7152,.0722)));
-      }col+=bl/25.*.7;
-      vec3 bl2=vec3(0);float bs2=7./uRes.x;
-      for(float i=-2.;i<=2.;i++)for(float j=-2.;j<=2.;j++){
-        vec3 s=texture2D(tDiffuse,uv+vec2(i,j)*bs2).rgb;
-        bl2+=s*smoothstep(.06,.4,dot(s,vec3(.2126,.7152,.0722)));
-      }col+=bl2/25.*.35;
-      col*=vec3(1.02,.99,.96);
-      col*=1.+.03*sin(uTime*.1);
-      gl_FragColor=vec4(col,1);
-    }`
-});
-postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),postMat));
+  vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=vec4(position,1);}',
+  fragmentShader:`uniform sampler2D tDiffuse;uniform float uTime;uniform vec2 uRes;varying vec2 v;
+    void main(){vec2 u=v;vec2 c=u-.5;u+=c*dot(c,c)*.02;float ca=.001*length(u-.5);
+    vec3 col=vec3(texture2D(tDiffuse,u+vec2(ca,0)).r,texture2D(tDiffuse,u).g,texture2D(tDiffuse,u-vec2(ca,0)).b);
+    vec3 b=vec3(0);float bs=3./uRes.x;
+    for(float i=-2.;i<=2.;i++)for(float j=-2.;j<=2.;j++){vec3 s=texture2D(tDiffuse,u+vec2(i,j)*bs).rgb;b+=s*smoothstep(.15,.7,dot(s,vec3(.2126,.7152,.0722)));}
+    col+=b/25.*.55;
+    vec3 b2=vec3(0);float bs2=8./uRes.x;
+    for(float i=-2.;i<=2.;i++)for(float j=-2.;j<=2.;j++){vec3 s=texture2D(tDiffuse,u+vec2(i,j)*bs2).rgb;b2+=s*smoothstep(.05,.35,dot(s,vec3(.2126,.7152,.0722)));}
+    col+=b2/25.*.22;col*=vec3(1.02,.99,.96);col*=1.+.02*sin(uTime*.08);gl_FragColor=vec4(col,1);}`
+});pS.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),pM));
 
-// ── Stars ──
-const SC=isMobile?1500:4000;
-const sGeo=new THREE.BufferGeometry(),sP=new Float32Array(SC*3),sS=new Float32Array(SC);
-for(let i=0;i<SC;i++){const t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1),r=100+Math.random()*150;sP[i*3]=r*Math.sin(p)*Math.cos(t);sP[i*3+1]=r*Math.sin(p)*Math.sin(t);sP[i*3+2]=r*Math.cos(p);sS[i]=.5+Math.random()*2}
-sGeo.setAttribute('position',new THREE.BufferAttribute(sP,3));
-sGeo.setAttribute('aSize',new THREE.BufferAttribute(sS,1));
-const sMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,
-  uniforms:{uTime:{value:0}},
-  vertexShader:'attribute float aSize;uniform float uTime;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1);vA=(.6+.4*sin(uTime*1.5+position.x*.1+position.y*.2))*.7;gl_PointSize=aSize*(80./-mv.z);gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'varying float vA;void main(){float d=length(gl_PointCoord-.5);float g=exp(-d*6.);vec3 c=mix(vec3(1,.9,.8),vec3(.8,.85,1),smoothstep(0,.5,d));gl_FragColor=vec4(c,g*vA);}'
-});
-scene.add(new THREE.Points(sGeo,sMat));
+// Stars
+const SC=M?1500:4000,sG=new THREE.BufferGeometry(),sP=new Float32Array(SC*3),sZ=new Float32Array(SC);
+for(let i=0;i<SC;i++){const t=Math.random()*6.283,p=Math.acos(2*Math.random()-1),r=100+Math.random()*150;sP[i*3]=r*Math.sin(p)*Math.cos(t);sP[i*3+1]=r*Math.sin(p)*Math.sin(t);sP[i*3+2]=r*Math.cos(p);sZ[i]=.5+Math.random()*2}
+sG.setAttribute('position',new THREE.BufferAttribute(sP,3));sG.setAttribute('aSize',new THREE.BufferAttribute(sZ,1));
+const sM=new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTime:{value:0}},
+vertexShader:'attribute float aSize;uniform float uTime;varying float a;void main(){vec4 m=modelViewMatrix*vec4(position,1);a=(.6+.4*sin(uTime*1.5+position.x*.1+position.y*.2))*.7;gl_PointSize=aSize*(80./-m.z);gl_Position=projectionMatrix*m;}',
+fragmentShader:'varying float a;void main(){float d=length(gl_PointCoord-.5);float g=exp(-d*6.);gl_FragColor=vec4(mix(vec3(1,.9,.8),vec3(.8,.85,1),smoothstep(0,.5,d)),g*a);}'});
+S.add(new THREE.Points(sG,sM));
 
-// ── Nebula ──
-const nGeo=new THREE.PlaneGeometry(200,200);
-const nMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,
-  uniforms:{uTime:{value:0}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
-  fragmentShader:'uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-.5;float d=length(p);float g=exp(-d*2.5)*.15;vec3 c=mix(vec3(.4,.15,.02),vec3(.08,.03,.01),d*2.);gl_FragColor=vec4(c,g*(.8+.2*sin(uTime*.05+d*3.)));}'
-});
-const neb=new THREE.Mesh(nGeo,nMat);neb.position.z=-80;scene.add(neb);
-const neb2=neb.clone();neb2.material=nMat.clone();
-neb2.material.fragmentShader='uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-vec2(.55,.45);float d=length(p);float g=exp(-d*3.)*.08;vec3 c=mix(vec3(.1,.05,.2),vec3(.02,.01,.05),d*2.);gl_FragColor=vec4(c,g);}';
-neb2.position.set(20,10,-100);neb2.scale.set(1.5,1.5,1);scene.add(neb2);
+// Nebula
+const nM=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:2,uniforms:{uTime:{value:0}},
+vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
+fragmentShader:'uniform float uTime;varying vec2 v;void main(){vec2 p=v-.5;float d=length(p);float g=exp(-d*2.5)*.15;vec3 c=mix(vec3(.4,.15,.02),vec3(.08,.03,.01),d*2.);gl_FragColor=vec4(c,g*(.8+.2*sin(uTime*.05+d*3.)));}'});
+const n1=new THREE.Mesh(new THREE.PlaneGeometry(200,200),nM);n1.position.z=-80;S.add(n1);
+const n2M=nM.clone();n2M.fragmentShader='uniform float uTime;varying vec2 v;void main(){vec2 p=v-vec2(.55,.45);float d=length(p);gl_FragColor=vec4(mix(vec3(.1,.05,.2),vec3(.02,.01,.05),d*2.),exp(-d*3.)*.08);}';
+const n2=new THREE.Mesh(new THREE.PlaneGeometry(200,200),n2M);n2.position.set(20,10,-100);n2.scale.set(1.5,1.5,1);S.add(n2);
 
-// ═══════════════════════════════════════════════════════════
-//  GATEWAY — Dynamic concentric rings only. No spokes/struts.
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════ GATEWAY ═══════════════════════════════
 
-const gw = new THREE.Group();
-scene.add(gw);
-const SEG = isMobile ? 64 : 128;
+const gw=new THREE.Group();S.add(gw);
+const coloredMats=[]; // Track all materials that need color lerp
 
-// Ring config: radius, tube thickness, base opacity, rotation speed, rotation axis, phase
-const ringDefs = [
-  // Primary ring (the logo ring)
-  { r:8,   tube:.10, op:.9,  rotSpeed:0,      axis:'z', phase:0, breathAmp:0,    breathSpeed:0,   zOsc:0 },
-  // Inner glow
-  { r:8,   tube:.5,  op:.06, rotSpeed:.003,   axis:'z', phase:0, breathAmp:0,    breathSpeed:0,   zOsc:0, glow:true },
-  // Scanning rings (counter-rotating, different speeds)
-  { r:9.2, tube:.03, op:.5,  rotSpeed:.015,   axis:'z', phase:0, breathAmp:.15,  breathSpeed:.4,  zOsc:.08 },
-  { r:10.5,tube:.04, op:.4,  rotSpeed:-.008,  axis:'z', phase:1, breathAmp:.2,   breathSpeed:.3,  zOsc:.12 },
-  { r:12,  tube:.03, op:.35, rotSpeed:.012,   axis:'z', phase:2, breathAmp:.1,   breathSpeed:.5,  zOsc:.06 },
-  { r:13.5,tube:.025,op:.25, rotSpeed:-.018,  axis:'z', phase:3, breathAmp:.25,  breathSpeed:.25, zOsc:.15 },
-  { r:15,  tube:.02, op:.2,  rotSpeed:.006,   axis:'z', phase:4, breathAmp:.15,  breathSpeed:.35, zOsc:.1 },
-  { r:16.5,tube:.02, op:.12, rotSpeed:-.01,   axis:'z', phase:5, breathAmp:.3,   breathSpeed:.2,  zOsc:.18 },
-  // Tilted accent rings (slight off-axis for depth)
-  { r:11,  tube:.02, op:.15, rotSpeed:.02,    axis:'x', phase:0, breathAmp:.1,   breathSpeed:.3,  zOsc:0, tiltX:.08 },
-  { r:14,  tube:.015,op:.1,  rotSpeed:-.015,  axis:'x', phase:2, breathAmp:.15,  breathSpeed:.25, zOsc:0, tiltX:-.06 },
-];
+// Logo texture baked into gateway
+const logoMesh=new THREE.Mesh(new THREE.PlaneGeometry(16.4,16.4),
+  new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:2,depthWrite:false,blending:THREE.AdditiveBlending}));
+logoMesh.position.z=.05;gw.add(logoMesh);
+new THREE.TextureLoader().load('img/co3-mark-circle.png',function(t){
+  t.encoding=THREE.sRGBEncoding;logoMesh.material.map=t;logoMesh.material.opacity=.2;logoMesh.material.needsUpdate=true;});
 
-const rings = [];
+// Primary ring
+const mainMat=new THREE.MeshStandardMaterial({color:0xff6700,emissive:0xff6700,emissiveIntensity:.5,metalness:.9,roughness:.2});
+gw.add(new THREE.Mesh(new THREE.TorusGeometry(8,.07,RSEG,TSEG),mainMat));
+coloredMats.push({mat:mainMat,type:'standard'});
 
-ringDefs.forEach((def, idx) => {
-  const geo = new THREE.TorusGeometry(def.r, def.tube, def.glow ? 16 : 48, SEG);
-  const mat = new THREE.MeshBasicMaterial({
-    color: O,
-    transparent: true,
-    opacity: def.op,
-    side: def.glow ? THREE.DoubleSide : THREE.FrontSide
-  });
-
-  // For the primary ring, use emissive material
-  let mesh;
-  if (idx === 0) {
-    const eMat = new THREE.MeshStandardMaterial({
-      color: O, emissive: O, emissiveIntensity: .6,
-      metalness: .8, roughness: .3, transparent: true, opacity: def.op
-    });
-    mesh = new THREE.Mesh(geo, eMat);
-  } else {
-    mesh = new THREE.Mesh(geo, mat);
-  }
-
-  if (def.tiltX) mesh.rotation.x = def.tiltX;
-
-  mesh.userData = {
-    baseOp: def.op,
-    rotSpeed: def.rotSpeed,
-    axis: def.axis,
-    phase: def.phase,
-    breathAmp: def.breathAmp,
-    breathSpeed: def.breathSpeed,
-    zOsc: def.zOsc,
-    baseRadius: def.r
-  };
-
-  gw.add(mesh);
-  rings.push(mesh);
-});
-
-// ── Scanning arc — a bright partial ring that orbits ──
-const scanGeo = new THREE.TorusGeometry(8.5, .06, 16, SEG, Math.PI * 0.4); // partial arc
-const scanMat = new THREE.MeshBasicMaterial({
-  color: O, transparent: true, opacity: .7
-});
-const scanArc = new THREE.Mesh(scanGeo, scanMat);
-gw.add(scanArc);
-
-// Second scanner on outer ring
-const scan2Geo = new THREE.TorusGeometry(13, .04, 16, SEG, Math.PI * 0.25);
-const scan2Mat = new THREE.MeshBasicMaterial({
-  color: O, transparent: true, opacity: .4
-});
-const scanArc2 = new THREE.Mesh(scan2Geo, scan2Mat);
-gw.add(scanArc2);
-
-// ── Portal interior ──
-const pMat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false,
-  uniforms:{uTime:{value:0}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
-  fragmentShader:`uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-.5;float d=length(p);float a=atan(p.y,p.x);float sw=sin(a*6.+d*20.-uTime*.8)*.5+.5;float rn=sin(d*40.-uTime*1.2)*.5+.5;float pt=sw*.4+rn*.6;float edge=smoothstep(.5,.42,d);float eG=smoothstep(.42,.5,d)*smoothstep(.52,.5,d)*3.;float ctr=smoothstep(.3,0.,d);vec3 c=vec3(1,.404,0);float al=pt*edge*.06+eG*.3+ctr*.02;al*=.8+.2*sin(uTime*.3);gl_FragColor=vec4(c*(.5+pt*.5),al);}`
-});
-gw.add(new THREE.Mesh(new THREE.CircleGeometry(7.8,64),pMat));
-
-// ── Particle streams ──
-const PC=isMobile?800:2500;
-const pGeo=new THREE.BufferGeometry(),pP=new Float32Array(PC*3),pPh=new Float32Array(PC),pSp=new Float32Array(PC),pRa=new Float32Array(PC);
-for(let i=0;i<PC;i++){const a=Math.random()*Math.PI*2,r=Math.random()*7;pP[i*3]=Math.cos(a)*r;pP[i*3+1]=Math.sin(a)*r;pP[i*3+2]=(Math.random()-.5)*60;pPh[i]=Math.random()*Math.PI*2;pSp[i]=.5+Math.random()*1.5;pRa[i]=r}
-pGeo.setAttribute('position',new THREE.BufferAttribute(pP,3));
-pGeo.setAttribute('aPhase',new THREE.BufferAttribute(pPh,1));
-pGeo.setAttribute('aSpeed',new THREE.BufferAttribute(pSp,1));
-pGeo.setAttribute('aRadius',new THREE.BufferAttribute(pRa,1));
-const pMat2=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-  uniforms:{uTime:{value:0}},
-  vertexShader:'attribute float aPhase,aSpeed,aRadius;uniform float uTime;varying float vA;void main(){vec3 pos=position;pos.z=mod(pos.z+uTime*aSpeed*3.+aPhase*20.,60.)-30.;float a2=atan(position.y,position.x)+uTime*.1*aSpeed;pos.x=cos(a2)*aRadius;pos.y=sin(a2)*aRadius;float pp=exp(-pos.z*pos.z*.005);pos.x*=1.-pp*.3;pos.y*=1.-pp*.3;vec4 mv=modelViewMatrix*vec4(pos,1);float dist=-mv.z;vA=(.15+pp*.5)*smoothstep(60.,5.,dist);gl_PointSize=max(1.,(1.+pp*2.5)*(20./max(dist,1.)));gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'varying float vA;void main(){float d=length(gl_PointCoord-.5);gl_FragColor=vec4(1,.404,0,exp(-d*5.)*vA);}'
-});
-scene.add(new THREE.Points(pGeo,pMat2));
-
-// Dust
-const DC=isMobile?400:1200;const dGeo=new THREE.BufferGeometry(),dP2=new Float32Array(DC*3);
-for(let i=0;i<DC;i++){dP2[i*3]=(Math.random()-.5)*100;dP2[i*3+1]=(Math.random()-.5)*60;dP2[i*3+2]=(Math.random()-.5)*100}
-dGeo.setAttribute('position',new THREE.BufferAttribute(dP2,3));
-scene.add(new THREE.Points(dGeo,new THREE.PointsMaterial({color:0xffa060,size:.06,transparent:true,opacity:.2,blending:THREE.AdditiveBlending,depthWrite:false})));
-
-// Hexagonal accents
-const HC=isMobile?6:14;
-for(let i=0;i<HC;i++){
-  const a=Math.random()*Math.PI*2,r=22+Math.random()*12;
-  const h=new THREE.Mesh(new THREE.CircleGeometry(.3+Math.random()*.5,6),new THREE.MeshBasicMaterial({color:O,transparent:true,opacity:.03+Math.random()*.05,wireframe:true}));
-  h.position.set(Math.cos(a)*r,(Math.random()-.5)*8,Math.sin(a)*r);
-  h.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);
-  scene.add(h);
+// Segmented ring builder
+function segRing(radius,tube,segs,gapFrac,opacity){
+  const g=new THREE.Group();const arc=(6.283/segs)*(1-gapFrac);
+  for(let i=0;i<segs;i++){
+    const m=new THREE.MeshBasicMaterial({color:0xff6700,transparent:true,opacity});
+    const mesh=new THREE.Mesh(new THREE.TorusGeometry(radius,tube,RSEG,TSEG,arc),m);
+    mesh.rotation.z=(i/segs)*6.283;g.add(mesh);coloredMats.push({mat:m,type:'basic'});
+  }return g;
 }
 
-// ── Lighting ──
-scene.add(new THREE.AmbientLight(0x0a0810,.4));
-const kL=new THREE.DirectionalLight(0xffa060,.6);kL.position.set(0,0,20);scene.add(kL);
-const rL=new THREE.DirectionalLight(O,.3);rL.position.set(0,10,-15);scene.add(rL);
-const fL=new THREE.PointLight(O,1,30);fL.position.set(0,0,0);scene.add(fL);
+// Ring 2: 4 arcs, CW creep
+const r2=segRing(10,.025,4,.15,.3);r2.userData={spd:.002,zAmp:.1};gw.add(r2);
 
-// ═══════════════════════════════════════════════════════════
-//  CAMERA STATE MACHINE
-// ═══════════════════════════════════════════════════════════
+// Ring 3: continuous ghost
+const r3Mat=new THREE.MeshBasicMaterial({color:0xff6700,transparent:true,opacity:.1});
+const r3=new THREE.Mesh(new THREE.TorusGeometry(12,.015,RSEG,TSEG),r3Mat);
+r3.userData={spd:-.001,zAmp:.18};gw.add(r3);coloredMats.push({mat:r3Mat,type:'basic'});
 
-const states = {
-  home:     { pos:[0, 0, 30],     look:[0, 0, 0],    orbit:true,  orbitR:5, orbitH:3, orbitS:.04 },
-  product:  { pos:[18, 4, 22],    look:[2, -1, 0],   orbit:true,  orbitR:2, orbitH:1, orbitS:.02 },
-  research: { pos:[0, 2, 14],     look:[0, 0, -3],   orbit:true,  orbitR:1.5,orbitH:.8,orbitS:.025},
-  contact:  { pos:[-16, 8, 26],   look:[-2, 1, 0],   orbit:true,  orbitR:2, orbitH:1.5,orbitS:.02 }
+// Ring 4: 3 arcs, CCW
+const r4=segRing(14,.02,3,.2,.18);r4.userData={spd:-.0015,zAmp:.13};gw.add(r4);
+
+// Ring 5: 6 dashes, outermost whisper
+const r5=segRing(16.5,.012,6,.6,.06);r5.userData={spd:.0008,zAmp:.22};gw.add(r5);
+
+const dynRings=[r2,r3,r4,r5];
+
+// Trackers
+const trMat=new THREE.MeshBasicMaterial({color:0xff6700,transparent:true,opacity:.7});
+const tr=new THREE.Mesh(new THREE.SphereGeometry(.1,16,16),trMat);gw.add(tr);
+coloredMats.push({mat:trMat,type:'basic'});
+const tr2Mat=new THREE.MeshBasicMaterial({color:0xff6700,transparent:true,opacity:.45});
+const tr2=new THREE.Mesh(new THREE.SphereGeometry(.07,12,12),tr2Mat);gw.add(tr2);
+coloredMats.push({mat:tr2Mat,type:'basic'});
+
+// Portal interior — uses uniform for accent color
+const portalUni={uTime:{value:0},uAccent:{value:new THREE.Vector3(1,.404,0)}};
+const portalMat=new THREE.ShaderMaterial({transparent:true,side:2,depthWrite:false,uniforms:portalUni,
+vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
+fragmentShader:`uniform float uTime;uniform vec3 uAccent;varying vec2 v;void main(){vec2 p=v-.5;float d=length(p);
+float pulse=sin(d*30.-uTime*.4)*.5+.5;float edge=smoothstep(.5,.42,d);float eg=smoothstep(.42,.5,d)*smoothstep(.52,.5,d)*3.;float ctr=smoothstep(.25,0.,d);
+float al=pulse*edge*.03+eg*.22+ctr*.012;al*=.85+.15*sin(uTime*.2);gl_FragColor=vec4(uAccent*(.4+pulse*.3),al);}`});
+gw.add(new THREE.Mesh(new THREE.CircleGeometry(7.8,64),portalMat));
+
+// Particles — uses uniform for accent
+const PC=M?500:1800;const pG=new THREE.BufferGeometry(),pp=new Float32Array(PC*3),ph=new Float32Array(PC),sp=new Float32Array(PC),ra=new Float32Array(PC);
+for(let i=0;i<PC;i++){const a=Math.random()*6.283,r=Math.random()*7;pp[i*3]=Math.cos(a)*r;pp[i*3+1]=Math.sin(a)*r;pp[i*3+2]=(Math.random()-.5)*60;ph[i]=Math.random()*6.283;sp[i]=.3+Math.random()*1;ra[i]=r}
+pG.setAttribute('position',new THREE.BufferAttribute(pp,3));pG.setAttribute('aPhase',new THREE.BufferAttribute(ph,1));
+pG.setAttribute('aSpeed',new THREE.BufferAttribute(sp,1));pG.setAttribute('aRadius',new THREE.BufferAttribute(ra,1));
+const partUni={uTime:{value:0},uAccent:{value:new THREE.Vector3(1,.404,0)}};
+const partMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:partUni,
+vertexShader:'attribute float aPhase,aSpeed,aRadius;uniform float uTime;varying float vA;void main(){vec3 pos=position;pos.z=mod(pos.z+uTime*aSpeed*2.+aPhase*20.,60.)-30.;float a2=atan(position.y,position.x)+uTime*.05*aSpeed;pos.x=cos(a2)*aRadius;pos.y=sin(a2)*aRadius;float pp2=exp(-pos.z*pos.z*.005);pos.x*=1.-pp2*.3;pos.y*=1.-pp2*.3;vec4 mv=modelViewMatrix*vec4(pos,1);float dist=-mv.z;vA=(.1+pp2*.35)*smoothstep(60.,5.,dist);gl_PointSize=max(1.,(1.+pp2*2.)*(16./max(dist,1.)));gl_Position=projectionMatrix*mv;}',
+fragmentShader:'uniform vec3 uAccent;varying float vA;void main(){float d=length(gl_PointCoord-.5);gl_FragColor=vec4(uAccent,exp(-d*5.)*vA);}'});
+S.add(new THREE.Points(pG,partMat));
+
+// Dust
+const DC=M?300:900;const dG=new THREE.BufferGeometry(),dp=new Float32Array(DC*3);
+for(let i=0;i<DC;i++){dp[i*3]=(Math.random()-.5)*100;dp[i*3+1]=(Math.random()-.5)*60;dp[i*3+2]=(Math.random()-.5)*100}
+dG.setAttribute('position',new THREE.BufferAttribute(dp,3));
+const dustMat=new THREE.PointsMaterial({color:0xff6700,size:.05,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false});
+S.add(new THREE.Points(dG,dustMat));coloredMats.push({mat:dustMat,type:'basic'});
+
+// Lighting
+S.add(new THREE.AmbientLight(0x0a0810,.3));
+const kL=new THREE.DirectionalLight(0xffa060,.5);kL.position.set(0,0,20);S.add(kL);
+const rL=new THREE.DirectionalLight(0xff6700,.2);rL.position.set(0,10,-15);S.add(rL);
+const fL=new THREE.PointLight(0xff6700,.8,25);fL.position.set(0,0,0);S.add(fL);
+
+// ═══════════════════════════════ CAMERA ═══════════════════════════════
+
+const states={
+  home:    {pos:[0,0,30],look:[0,0,0],oR:4,oH:2.5,oS:.03},
+  product: {pos:[18,4,22],look:[2,-1,0],oR:2,oH:1,oS:.02},
+  research:{pos:[0,2,14],look:[0,0,-3],oR:1.5,oH:.8,oS:.02},
+  contact: {pos:[-16,8,26],look:[-2,1,0],oR:2,oH:1.5,oS:.015}
 };
+let curState='home',tPos=new THREE.Vector3(0,0,30),tLook=new THREE.Vector3(0,0,0);
+let cPos=new THREE.Vector3(0,0,30),cLook=new THREE.Vector3(0,0,0),oA=0,trans=false;
+cam.position.copy(cPos);cam.lookAt(cLook);
 
-let currentState = 'home';
-let targetPos = new THREE.Vector3(0,0,30);
-let targetLook = new THREE.Vector3(0,0,0);
-let currentPos = new THREE.Vector3(0,0,30);
-let currentLook = new THREE.Vector3(0,0,0);
-let orbitAngle = 0;
-let transitioning = false;
-
-camera.position.copy(currentPos);
-camera.lookAt(currentLook);
-
-window.co3Scene = {
-  setState: function(name){
-    if(!states[name] || name===currentState) return;
-    currentState = name;
-    const s = states[name];
-    targetPos.set(s.pos[0],s.pos[1],s.pos[2]);
-    targetLook.set(s.look[0],s.look[1],s.look[2]);
-    transitioning = true;
-    setTimeout(()=>{ transitioning=false; }, 2200);
+window.co3Scene={
+  setState(n){if(!states[n]||n===curState)return;curState=n;const s=states[n];
+    tPos.set(s.pos[0],s.pos[1],s.pos[2]);tLook.set(s.look[0],s.look[1],s.look[2]);
+    trans=true;setTimeout(()=>{trans=false},2200);
+    // Color target
+    accentTarget.copy(n==='product'?GOLD:ORANGE);
   },
-  getState: function(){ return currentState; }
+  getState(){return curState}
 };
 
-// ═══════════════════════════════════════════════════════════
-//  ANIMATION LOOP — Dynamic ring behaviors
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════ LOOP ═══════════════════════════════
 
-const clock = new THREE.Clock();
+let glitchTimer=8+Math.random()*7,glitchTgt=null,glitchOff=0,glitchDec=0;
+const clock=new THREE.Clock();
+
 function animate(){
   requestAnimationFrame(animate);
-  const dt = Math.min(clock.getDelta(),.05);
-  const t = clock.getElapsedTime();
+  const dt=Math.min(clock.getDelta(),.05),t=clock.getElapsedTime();
 
   // Uniforms
-  sMat.uniforms.uTime.value=t;
-  nMat.uniforms.uTime.value=t;
-  pMat.uniforms.uTime.value=t;
-  pMat2.uniforms.uTime.value=t;
-  postMat.uniforms.uTime.value=t;
+  sM.uniforms.uTime.value=t;nM.uniforms.uTime.value=t;
+  portalUni.uTime.value=t;partUni.uTime.value=t;pM.uniforms.uTime.value=t;
 
-  // ── Dynamic ring animation ──
-  rings.forEach((ring, idx) => {
-    const u = ring.userData;
-
-    // Independent rotation per ring
-    if (u.axis === 'z') ring.rotation.z += u.rotSpeed;
-    else if (u.axis === 'x') ring.rotation.x += u.rotSpeed;
-
-    // Opacity breathing (wave from center outward)
-    if (u.breathAmp > 0) {
-      const wave = Math.sin(t * u.breathSpeed + u.phase * 1.5) * u.breathAmp;
-      ring.material.opacity = Math.max(0.02, u.baseOp * (1 + wave));
-    }
-
-    // Z-axis oscillation (rings drifting forward/back)
-    if (u.zOsc > 0) {
-      ring.position.z = Math.sin(t * 0.3 + u.phase * 2) * u.zOsc;
-    }
+  // ── Color lerp ──
+  accent.lerp(accentTarget,dt*1.5);
+  const av=new THREE.Vector3(accent.r,accent.g,accent.b);
+  portalUni.uAccent.value.copy(av);
+  partUni.uAccent.value.copy(av);
+  coloredMats.forEach(({mat,type})=>{
+    mat.color.copy(accent);
+    if(type==='standard')mat.emissive.copy(accent);
   });
+  fL.color.copy(accent);rL.color.copy(accent);
+  dustMat.color.copy(accent);
 
-  // ── Scanning arcs — continuous rotation ──
-  scanArc.rotation.z = t * 0.8;
-  scanMat.opacity = 0.4 + 0.3 * Math.sin(t * 1.2);
+  // ── Rings — slow, precise ──
+  dynRings.forEach(r=>{
+    r.rotation.z+=r.userData.spd;
+    r.position.z=Math.sin(t*.07+dynRings.indexOf(r)*1.5)*r.userData.zAmp;
+  });
+  r3Mat.opacity=.08+.04*Math.sin(t*.12);
 
-  scanArc2.rotation.z = -t * 0.5;
-  scan2Mat.opacity = 0.2 + 0.2 * Math.sin(t * 0.8 + 1);
+  // ── Glitch ──
+  glitchTimer-=dt;
+  if(glitchTimer<=0&&!glitchTgt){const tgts=[r2,r4,r5];glitchTgt=tgts[Math.floor(Math.random()*3)];glitchOff=(Math.random()-.5)*.06;glitchDec=.25;glitchTimer=7+Math.random()*12}
+  if(glitchTgt){glitchTgt.rotation.z+=glitchOff;glitchDec-=dt;if(glitchDec<=0){glitchTgt=null;glitchOff=0}}
 
-  // Gateway base rotation (very slow)
-  gw.rotation.z += dt * .01;
+  // ── Trackers ──
+  const t1a=t*.1;tr.position.set(Math.cos(t1a)*8.05,Math.sin(t1a)*8.05,.08);
+  trMat.opacity=.45+.25*Math.sin(t*.6);
+  const t2a=-t*.07+3.14;tr2.position.set(Math.cos(t2a)*14.05,Math.sin(t2a)*14.05,r4.position.z);
 
-  // Fill light pulse
-  fL.intensity = .8 + .3 * Math.sin(t * .4);
+  // Logo pulse
+  if(logoMesh.material.map)logoMesh.material.opacity=.18+.025*Math.sin(t*.12);
 
-  // Camera lerp
-  const lerpSpeed = transitioning ? 1.8 : 3.0;
-  currentPos.lerp(targetPos, dt*lerpSpeed);
-  currentLook.lerp(targetLook, dt*lerpSpeed);
+  // Gateway drift
+  gw.rotation.z+=dt*.003;
 
-  const s = states[currentState];
-  if(s.orbit){
-    orbitAngle += dt * s.orbitS;
-    camera.position.set(
-      currentPos.x + Math.sin(orbitAngle)*s.orbitR,
-      currentPos.y + Math.cos(orbitAngle*.7)*s.orbitH,
-      currentPos.z + Math.sin(orbitAngle*.3)*(s.orbitR*.5)
-    );
-  } else {
-    camera.position.copy(currentPos);
-  }
+  // Light breathe
+  fL.intensity=.7+.12*Math.sin(t*.2);
 
-  camera.lookAt(
-    currentLook.x + Math.sin(t*.15)*.3,
-    currentLook.y + Math.cos(t*.1)*.2,
-    currentLook.z
-  );
+  // ── Camera ──
+  const ls=trans?1.8:3;cPos.lerp(tPos,dt*ls);cLook.lerp(tLook,dt*ls);
+  const s=states[curState];oA+=dt*s.oS;
+  cam.position.set(cPos.x+Math.sin(oA)*s.oR,cPos.y+Math.cos(oA*.7)*s.oH,cPos.z+Math.sin(oA*.3)*(s.oR*.4));
+  cam.lookAt(cLook.x+Math.sin(t*.1)*.15,cLook.y+Math.cos(t*.07)*.1,cLook.z);
 
-  // Render pipeline
-  renderer.setRenderTarget(rt);
-  renderer.render(scene,camera);
-  renderer.setRenderTarget(null);
-  postMat.uniforms.tDiffuse.value=rt.texture;
-  renderer.render(postScene,postCamera);
+  // Render
+  R.setRenderTarget(rt);R.render(S,cam);R.setRenderTarget(null);
+  pM.uniforms.tDiffuse.value=rt.texture;R.render(pS,pC);
 }
 animate();
 
-window.addEventListener('resize',()=>{
-  const w=window.innerWidth,h=window.innerHeight;
-  camera.aspect=w/h;camera.updateProjectionMatrix();
-  renderer.setSize(w,h);
-  const p2=Math.min(window.devicePixelRatio,isMobile?1.5:2);
-  rt.setSize(w*p2,h*p2);
-  postMat.uniforms.uRes.value.set(w,h);
-});
-
+window.addEventListener('resize',()=>{const w=window.innerWidth,h=window.innerHeight;
+cam.aspect=w/h;cam.updateProjectionMatrix();R.setSize(w,h);
+const p2=Math.min(window.devicePixelRatio,M?1.5:2);rt.setSize(w*p2,h*p2);pM.uniforms.uRes.value.set(w,h);});
 })();
