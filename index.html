@@ -50,9 +50,9 @@
   <!-- Home: centered tagline -->
   <div class="tagline visible">Constraint-aware artificial intelligence</div>
 
-  <!-- Other pages: top-left brand line (Co³ + tagline on one line) -->
+  <!-- Other pages: top-left brand line (Co³ image + tagline on one line) -->
   <div class="brand-line" id="brandLine">
-    <span class="bl-logo">Co<sup>3</sup></span>
+    <img class="bl-logo" src="img/co3-text-grey.png" alt="Co3" draggable="false">
     <span class="bl-tag">Constraint-aware artificial intelligence</span>
   </div>
 
@@ -101,41 +101,43 @@
 
   <!-- CONTACT -->
   <div id="contact" class="page">
-    <div class="page-inner">
-      <div class="c-heading rv">Get in touch</div>
-      <form class="c-form" action="https://formsubmit.co/support@co3.one" method="POST">
-        <input type="hidden" name="_captcha" value="true">
-        <input type="hidden" name="_subject" value="CO3 ONE Contact">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_next" value="https://co3.one">
-        <div class="c-field rv">
-          <label>Topic</label>
-          <select name="topic" required>
-            <option value="" disabled selected>Select a topic</option>
-            <option value="general">General inquiry</option>
-            <option value="partnership">Partnership</option>
-            <option value="press">Press / media</option>
-            <option value="investment">Investment</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="c-field rv">
-          <label>Name</label>
-          <input type="text" name="name" placeholder="Your name" required>
-        </div>
-        <div class="c-field rv">
-          <label>Email</label>
-          <input type="email" name="email" placeholder="your@email.com" required>
-        </div>
-        <div class="c-field rv">
-          <label>Message</label>
-          <textarea name="message" placeholder="How can we help?" rows="3" required></textarea>
-        </div>
-        <div class="c-submit rv">
-          <button type="submit">Send</button>
-        </div>
-      </form>
-      <div class="c-info rv">
+    <div class="c-layout">
+      <div class="page-inner rv">
+        <div class="c-heading">Get in touch</div>
+        <form class="c-form" action="https://formsubmit.co/support@co3.one" method="POST">
+          <input type="hidden" name="_captcha" value="true">
+          <input type="hidden" name="_subject" value="CO3 ONE Contact">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://co3.one">
+          <div class="c-field">
+            <label>Topic</label>
+            <select name="topic" required>
+              <option value="" disabled selected>Select a topic</option>
+              <option value="general">General inquiry</option>
+              <option value="partnership">Partnership</option>
+              <option value="press">Press / media</option>
+              <option value="investment">Investment</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="c-field">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="Your name" required>
+          </div>
+          <div class="c-field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="your@email.com" required>
+          </div>
+          <div class="c-field">
+            <label>Message</label>
+            <textarea name="message" placeholder="How can we help?" rows="3" required></textarea>
+          </div>
+          <div class="c-submit">
+            <button type="submit">Send</button>
+          </div>
+        </form>
+      </div>
+      <div class="page-inner rv">
         <div class="c-phone">(302) 600-2330</div>
         <span class="c-phone-tag">Office line · voicemail</span>
         <div class="c-addresses">
