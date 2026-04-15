@@ -1,7 +1,7 @@
 {
   "name": "CO3 ONE",
   "short_name": "CO3",
-  "description": "Constraint-aware artificial intelligence.",
+  "description": "Constraint-aware systems, standards, and infrastructure for safety and accountability in artificial intelligence across high-stakes environments.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a10",
