@@ -61,50 +61,64 @@
   <!-- HOME -->
   <div id="home" class="page"></div>
 
-  <!-- PRODUCT -->
-  <div id="product" class="page">
-    <div class="page-inner rv">
-      <div class="p-greeting">hi, i'm miji.</div>
-      <p class="p-desc">the emotional awareness companion. check in with yourself and the people around you. see what miji sees in you, track yourself over time, and share your day with the people who matter.</p>
-      <div class="p-card">
-        <div class="p-card-inner">
-          <div class="p-card-name">Mia</div>
-          <div class="p-card-date">sunday<br>march 22</div>
-          <div class="p-card-score">72</div>
-          <div class="p-card-obs">good day today. felt like myself again.</div>
-          <div class="p-card-mark">miji</div>
-        </div>
-      </div>
-      <a href="https://www.miji.one" target="_blank" rel="noopener" class="p-link">miji.one <span class="arr">&rarr;</span></a>
-    </div>
-  </div>
-
-  <!-- RESEARCH -->
+  <!-- RESEARCH (first in nav) -->
   <div id="research" class="page">
     <div class="page-inner rv">
       <div class="r-item">
         <div class="r-label">Framework</div>
         <div class="r-title">RCOT</div>
-        <div class="r-desc">Restraint Continuity Observation Translation. Formal constraint-optimization architecture. Domain-agnostic.</div>
+        <div class="r-desc">Restraint Continuity Observation Translation. Formal constraint-optimization architecture governing all system behavior. Evaluates margin-to-boundary scores across every operation, verifying that systems stay within authorized parameters. Applicable from consumer perception to classified document intelligence.</div>
       </div>
       <div class="r-div"></div>
       <div class="r-item">
         <div class="r-label">Patent Pending</div>
         <div class="r-title">Constraint-Aware Trajectory Optimization</div>
-        <div class="r-desc">USPTO #19/448,772 · TTBC maximin selection</div>
+        <div class="r-desc">USPTO #19/448,772 · TTBC maximin selection. Decision architecture evaluating paths under formal constraints, selecting optimal trajectories while respecting safety boundaries at every step.</div>
       </div>
       <div class="r-div"></div>
       <div class="r-item">
         <div class="r-label">ARC-AGI-3 Benchmark</div>
         <div class="r-title">~20% RHAE</div>
-        <div class="r-desc">Constraint-native · Active competition entry</div>
+        <div class="r-desc">Constraint-native architecture · Active entry</div>
         <a href="https://arcprize.org/arc-agi/3" target="_blank" rel="noopener" class="r-link">arc-agi-3 <span class="arr">&rarr;</span></a>
       </div>
       <div class="r-div"></div>
       <div class="r-item">
         <div class="r-label">Systems</div>
-        <div class="r-desc">TVAR · Distributed cognitive perception engine<br>SENTINEL · Cryptographic audit infrastructure · 486+ tests</div>
+        <div class="r-title">TVAR 2.0</div>
+        <div class="r-desc">Real-time distributed cognitive perception engine. On-device facial landmark tracking across 42 points, vocal pattern analysis, and composite emotional scoring. Zero cloud dependency.</div>
       </div>
+      <div class="r-div"></div>
+      <div class="r-item">
+        <div class="r-label">Infrastructure</div>
+        <div class="r-title">SENTINEL</div>
+        <div class="r-desc">Cryptographic audit layer. AES-256-GCM encryption at rest, immutable consent records with cryptographic timestamps, append-only tamper-detecting logs, compartmentalized access control. 486+ tests passing.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIJI (product page, miji-verse) -->
+  <div id="product" class="page">
+    <div class="page-inner miji-verse rv">
+      <div class="m-greeting">hi, i'm miji.</div>
+      <div class="m-tagline">see yourself clearly.</div>
+      <p class="m-desc">the emotional awareness companion. it only takes a few moments to check in with yourself and the people around you. see what miji sees in you, track yourself over time, and share your day with the people in your life who matter.</p>
+      <div class="m-card-wrap">
+        <div class="m-card" data-mood="mid">
+          <div class="m-card-watermark">Lena</div>
+          <svg class="m-card-curve" viewBox="0 0 160 32" preserveAspectRatio="none">
+            <path class="m-curve-line" d="M0,22 C18,18 32,20 50,14 C62,10 72,18 88,16 C102,14 118,8 135,12 C148,15 155,10 160,8"/>
+            <circle class="m-curve-dot" cx="0" cy="0" r="1.8"/>
+          </svg>
+          <div class="m-card-content">
+            <div class="m-card-date"><span class="m-card-day">thursday</span><br>april 10</div>
+            <div class="m-card-score"><span class="m-score-ring"></span>64</div>
+            <div class="m-card-obs">getting there. one step at a time.</div>
+            <div class="m-card-brand">miji</div>
+          </div>
+        </div>
+      </div>
+      <a href="https://www.miji.one" target="_blank" rel="noopener" class="m-link">miji.one <span class="arr">&rarr;</span></a>
     </div>
   </div>
 
@@ -113,7 +127,7 @@
     <div class="c-layout">
       <div class="page-inner rv">
         <div class="c-heading">Get in touch</div>
-        <form class="c-form" action="https://formsubmit.co/support@co3.one" method="POST">
+        <form class="c-form" action="https://formsubmit.co/contact@co3.one" method="POST">
           <input type="hidden" name="_captcha" value="true">
           <input type="hidden" name="_subject" value="CO3 ONE Contact">
           <input type="hidden" name="_template" value="table">
@@ -189,8 +203,8 @@
 
   <nav>
     <a href="#" data-page="home">Home</a>
-    <a href="#product" data-page="product">Product</a>
     <a href="#research" data-page="research">Research</a>
+    <a href="#product" data-page="product">miji</a>
     <a href="#contact" data-page="contact">Contact</a>
   </nav>
 
