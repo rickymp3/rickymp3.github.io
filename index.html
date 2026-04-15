@@ -23,7 +23,7 @@
   <meta name="twitter:description" content="Constraint-aware intelligence.">
   <meta name="twitter:image" content="https://co3.one/img/og-image.png">
 
-  <!-- Favicon + Icons (all platforms) -->
+  <!-- Favicon + Icons -->
   <link rel="icon" type="image/x-icon" href="img/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
@@ -35,12 +35,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CO3 ONE">
 
-  <!-- Font preloads (critical weights only) -->
+  <!-- Font preloads -->
   <link rel="preload" href="fonts/sohne-buch.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/sohne-breit-300.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/sohne-breit-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/gt-pressura-light.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -49,47 +49,36 @@
   <div id="scene-container"></div>
   <div class="overlay-vignette"></div>
   <div class="overlay-grain"></div>
-
-  <!-- Transition flash -->
   <div class="transition-flash"></div>
 
-  <!-- Corner logo -->
-  <a class="corner-logo" href="#" aria-label="Home">
-    <img src="img/co3-mark.png" alt="CO3 ONE" width="40" height="40">
-  </a>
+  <!-- No corner logo — the mark lives on the home screen -->
 
-  <!-- ════════════════════════════════════════════════════════
-       PAGE: HOME
-       ════════════════════════════════════════════════════════ -->
+  <!-- ═══ HOME ═══ -->
   <div id="home" class="page">
     <div class="page-inner">
-      <div class="hero-wordmark reveal">CO3 ONE</div>
-      <div class="hero-tagline reveal">Constraint-aware intelligence</div>
-      <div class="hero-line reveal"></div>
+      <div class="hero-mark">
+        <img src="img/co3-mark.png" alt="CO3 ONE" draggable="false">
+      </div>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       PAGE: PRODUCT
-       ════════════════════════════════════════════════════════ -->
+  <!-- ═══ PRODUCT ═══ -->
   <div id="product" class="page">
     <div class="page-inner">
       <div class="product-kanji reveal">見慈</div>
       <div class="product-name reveal">miji</div>
       <p class="product-desc reveal">
-        The first AI that sees you. Real-time emotional perception 
-        through facial and vocal analysis. Fully on-device. 
-        Private by architecture.
+        the first ai that sees you. real-time emotional perception 
+        through facial and vocal analysis. fully on-device. 
+        private by architecture.
       </p>
       <a href="https://www.miji.one" target="_blank" rel="noopener" class="product-link reveal">
-        miji.one <span class="arrow">→</span>
+        miji.one <span class="arrow">&rarr;</span>
       </a>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       PAGE: RESEARCH
-       ════════════════════════════════════════════════════════ -->
+  <!-- ═══ RESEARCH ═══ -->
   <div id="research" class="page">
     <div class="page-inner">
 
@@ -104,15 +93,15 @@
       <div class="research-item reveal">
         <div class="research-label">Patent Pending</div>
         <div class="research-title">Constraint-Aware Trajectory Optimization</div>
-        <div class="research-desc">USPTO #19/448,772 · TTBC maximin selection · 28 claims</div>
+        <div class="research-desc">USPTO #19/448,772 · TTBC maximin selection</div>
       </div>
 
       <div class="research-divider reveal"></div>
 
       <div class="research-item reveal">
         <div class="research-label">Benchmark</div>
-        <div class="research-stat">>2% RHAE</div>
-        <div class="research-stat-label">ARC-AGI-3 · Top of public leaderboard · First L2 completion</div>
+        <div class="research-stat">~20% RHAE</div>
+        <div class="research-stat-label">ARC-AGI-3 · Constraint-native architecture · Active competition entry</div>
       </div>
 
       <div class="research-divider reveal"></div>
@@ -125,14 +114,33 @@
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       PAGE: CONTACT
-       ════════════════════════════════════════════════════════ -->
+  <!-- ═══ CONTACT ═══ -->
   <div id="contact" class="page">
     <div class="page-inner">
 
-      <a href="mailto:founder@co3.one" class="contact-email reveal">founder@co3.one</a>
+      <div class="contact-heading reveal">Get in touch</div>
+
+      <form class="contact-form reveal" action="https://formsubmit.co/support@co3.one" method="POST">
+        <input type="hidden" name="_captcha" value="true">
+        <input type="hidden" name="_subject" value="CO3 ONE Contact Form">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://co3.one">
+        <select name="topic" required>
+          <option value="" disabled selected>topic</option>
+          <option value="general">general inquiry</option>
+          <option value="partnership">partnership</option>
+          <option value="press">press / media</option>
+          <option value="investment">investment</option>
+          <option value="other">other</option>
+        </select>
+        <input type="text" name="name" placeholder="name" required>
+        <input type="email" name="email" placeholder="email" required>
+        <textarea name="message" placeholder="message" rows="3" required></textarea>
+        <button type="submit">Send</button>
+      </form>
+
       <div class="contact-phone reveal">(302) 600-2330</div>
+      <span class="contact-phone-tag reveal">Office line · voicemail</span>
 
       <div class="contact-addresses reveal">
         <div>
@@ -171,14 +179,13 @@
     <a href="#contact" data-page="contact">Contact</a>
   </nav>
 
-  <!-- Footer info -->
+  <!-- Footer -->
   <div class="footer-info">
-    <a href="https://www.miji.one" target="_blank" rel="noopener">miji.one</a><br>
-    © 2026 CO3 ONE INC. · CO3 ONE LLC<br>
+    <a href="https://www.miji.one" target="_blank" rel="noopener">miji.one</a> · <a href="brand.html">brand</a><br>
+    &copy; 2026 CO3 ONE INC. &middot; CO3 ONE LLC<br>
     Delaware Public Benefit Corporation
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/scene.js"></script>
   <script src="js/app.js"></script>

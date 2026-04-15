@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   CO3 ONE — Gateway Scene
-   Three.js r128 + GLSL post-processing
-   Camera state machine driven by app.js
+   CO3 ONE — Gateway Scene v3
+   Dynamic rings, no radial lines/struts
    ═══════════════════════════════════════════════════════════ */
 
 (function(){
@@ -64,8 +63,8 @@ sGeo.setAttribute('position',new THREE.BufferAttribute(sP,3));
 sGeo.setAttribute('aSize',new THREE.BufferAttribute(sS,1));
 const sMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,
   uniforms:{uTime:{value:0}},
-  vertexShader:`attribute float aSize;uniform float uTime;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1);vA=(.6+.4*sin(uTime*1.5+position.x*.1+position.y*.2))*.7;gl_PointSize=aSize*(80./-mv.z);gl_Position=projectionMatrix*mv;}`,
-  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-.5);float g=exp(-d*6.);vec3 c=mix(vec3(1,.9,.8),vec3(.8,.85,1),smoothstep(0,.5,d));gl_FragColor=vec4(c,g*vA);}`
+  vertexShader:'attribute float aSize;uniform float uTime;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1);vA=(.6+.4*sin(uTime*1.5+position.x*.1+position.y*.2))*.7;gl_PointSize=aSize*(80./-mv.z);gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'varying float vA;void main(){float d=length(gl_PointCoord-.5);float g=exp(-d*6.);vec3 c=mix(vec3(1,.9,.8),vec3(.8,.85,1),smoothstep(0,.5,d));gl_FragColor=vec4(c,g*vA);}'
 });
 scene.add(new THREE.Points(sGeo,sMat));
 
@@ -74,60 +73,102 @@ const nGeo=new THREE.PlaneGeometry(200,200);
 const nMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,
   uniforms:{uTime:{value:0}},
   vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
-  fragmentShader:`uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-.5;float d=length(p);float g=exp(-d*2.5)*.15;vec3 c=mix(vec3(.4,.15,.02),vec3(.08,.03,.01),d*2.);gl_FragColor=vec4(c,g*(.8+.2*sin(uTime*.05+d*3.)));}`
+  fragmentShader:'uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-.5;float d=length(p);float g=exp(-d*2.5)*.15;vec3 c=mix(vec3(.4,.15,.02),vec3(.08,.03,.01),d*2.);gl_FragColor=vec4(c,g*(.8+.2*sin(uTime*.05+d*3.)));}'
 });
 const neb=new THREE.Mesh(nGeo,nMat);neb.position.z=-80;scene.add(neb);
 const neb2=neb.clone();neb2.material=nMat.clone();
-neb2.material.fragmentShader=`uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-vec2(.55,.45);float d=length(p);float g=exp(-d*3.)*.08;vec3 c=mix(vec3(.1,.05,.2),vec3(.02,.01,.05),d*2.);gl_FragColor=vec4(c,g);}`;
+neb2.material.fragmentShader='uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-vec2(.55,.45);float d=length(p);float g=exp(-d*3.)*.08;vec3 c=mix(vec3(.1,.05,.2),vec3(.02,.01,.05),d*2.);gl_FragColor=vec4(c,g);}';
 neb2.position.set(20,10,-100);neb2.scale.set(1.5,1.5,1);scene.add(neb2);
 
-// ── Gateway ──
-const gw=new THREE.Group();scene.add(gw);
-const SEG=isMobile?64:128;
+// ═══════════════════════════════════════════════════════════
+//  GATEWAY — Dynamic concentric rings only. No spokes/struts.
+// ═══════════════════════════════════════════════════════════
 
-// Main ring — HIGH segment count to eliminate aliasing
-const mTGeo=new THREE.TorusGeometry(8,.12,64,SEG);
-const mTMat=new THREE.MeshStandardMaterial({color:O,emissive:O,emissiveIntensity:.6,metalness:.8,roughness:.3});
-gw.add(new THREE.Mesh(mTGeo,mTMat));
+const gw = new THREE.Group();
+scene.add(gw);
+const SEG = isMobile ? 64 : 128;
 
-// Inner glow
-const iGGeo=new THREE.TorusGeometry(8,.5,32,SEG);
-gw.add(new THREE.Mesh(iGGeo,new THREE.MeshBasicMaterial({color:O,transparent:true,opacity:.08,side:THREE.DoubleSide})));
+// Ring config: radius, tube thickness, base opacity, rotation speed, rotation axis, phase
+const ringDefs = [
+  // Primary ring (the logo ring)
+  { r:8,   tube:.10, op:.9,  rotSpeed:0,      axis:'z', phase:0, breathAmp:0,    breathSpeed:0,   zOsc:0 },
+  // Inner glow
+  { r:8,   tube:.5,  op:.06, rotSpeed:.003,   axis:'z', phase:0, breathAmp:0,    breathSpeed:0,   zOsc:0, glow:true },
+  // Scanning rings (counter-rotating, different speeds)
+  { r:9.2, tube:.03, op:.5,  rotSpeed:.015,   axis:'z', phase:0, breathAmp:.15,  breathSpeed:.4,  zOsc:.08 },
+  { r:10.5,tube:.04, op:.4,  rotSpeed:-.008,  axis:'z', phase:1, breathAmp:.2,   breathSpeed:.3,  zOsc:.12 },
+  { r:12,  tube:.03, op:.35, rotSpeed:.012,   axis:'z', phase:2, breathAmp:.1,   breathSpeed:.5,  zOsc:.06 },
+  { r:13.5,tube:.025,op:.25, rotSpeed:-.018,  axis:'z', phase:3, breathAmp:.25,  breathSpeed:.25, zOsc:.15 },
+  { r:15,  tube:.02, op:.2,  rotSpeed:.006,   axis:'z', phase:4, breathAmp:.15,  breathSpeed:.35, zOsc:.1 },
+  { r:16.5,tube:.02, op:.12, rotSpeed:-.01,   axis:'z', phase:5, breathAmp:.3,   breathSpeed:.2,  zOsc:.18 },
+  // Tilted accent rings (slight off-axis for depth)
+  { r:11,  tube:.02, op:.15, rotSpeed:.02,    axis:'x', phase:0, breathAmp:.1,   breathSpeed:.3,  zOsc:0, tiltX:.08 },
+  { r:14,  tube:.015,op:.1,  rotSpeed:-.015,  axis:'x', phase:2, breathAmp:.15,  breathSpeed:.25, zOsc:0, tiltX:-.06 },
+];
 
-// Concentric rings
-[9.5,11,13,15.5].forEach((r,i)=>{
-  const g=new THREE.TorusGeometry(r,[.06,.04,.03,.02][i],32,SEG);
-  gw.add(new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:O,transparent:true,opacity:[.7,.5,.3,.15][i]})));
+const rings = [];
+
+ringDefs.forEach((def, idx) => {
+  const geo = new THREE.TorusGeometry(def.r, def.tube, def.glow ? 16 : 48, SEG);
+  const mat = new THREE.MeshBasicMaterial({
+    color: O,
+    transparent: true,
+    opacity: def.op,
+    side: def.glow ? THREE.DoubleSide : THREE.FrontSide
+  });
+
+  // For the primary ring, use emissive material
+  let mesh;
+  if (idx === 0) {
+    const eMat = new THREE.MeshStandardMaterial({
+      color: O, emissive: O, emissiveIntensity: .6,
+      metalness: .8, roughness: .3, transparent: true, opacity: def.op
+    });
+    mesh = new THREE.Mesh(geo, eMat);
+  } else {
+    mesh = new THREE.Mesh(geo, mat);
+  }
+
+  if (def.tiltX) mesh.rotation.x = def.tiltX;
+
+  mesh.userData = {
+    baseOp: def.op,
+    rotSpeed: def.rotSpeed,
+    axis: def.axis,
+    phase: def.phase,
+    breathAmp: def.breathAmp,
+    breathSpeed: def.breathSpeed,
+    zOsc: def.zOsc,
+    baseRadius: def.r
+  };
+
+  gw.add(mesh);
+  rings.push(mesh);
 });
 
-// Radial rays
-for(let i=0;i<24;i++){
-  const a=(i/24)*Math.PI*2,iR=8.3,oR=15.8;
-  const pts=[new THREE.Vector3(Math.cos(a)*iR,Math.sin(a)*iR,0),new THREE.Vector3(Math.cos(a)*oR,Math.sin(a)*oR,0)];
-  gw.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:O,transparent:true,opacity:.1})));
-}
+// ── Scanning arc — a bright partial ring that orbits ──
+const scanGeo = new THREE.TorusGeometry(8.5, .06, 16, SEG, Math.PI * 0.4); // partial arc
+const scanMat = new THREE.MeshBasicMaterial({
+  color: O, transparent: true, opacity: .7
+});
+const scanArc = new THREE.Mesh(scanGeo, scanMat);
+gw.add(scanArc);
 
-// Structural cross-members (4 symmetrical)
-for(let q=0;q<4;q++){
-  const a=(q/4)*Math.PI*2+Math.PI/8,pg=new THREE.Group();
-  const sGeo2=new THREE.BoxGeometry(.15,4.5,.08);
-  const sMat2=new THREE.MeshStandardMaterial({color:O,emissive:O,emissiveIntensity:.3,metalness:.9,roughness:.2});
-  const s1=new THREE.Mesh(sGeo2,sMat2);s1.position.y=10.2;pg.add(s1);
-  const cG=new THREE.ConeGeometry(.3,.6,3);
-  const cM=new THREE.MeshBasicMaterial({color:O,transparent:true,opacity:.5});
-  const c1=new THREE.Mesh(cG,cM);c1.position.y=8.3;c1.rotation.z=Math.PI;pg.add(c1);
-  const s2=s1.clone();s2.position.y=-10.2;pg.add(s2);
-  const c2=c1.clone();c2.position.y=-8.3;c2.rotation.z=0;pg.add(c2);
-  pg.rotation.z=a;gw.add(pg);
-}
+// Second scanner on outer ring
+const scan2Geo = new THREE.TorusGeometry(13, .04, 16, SEG, Math.PI * 0.25);
+const scan2Mat = new THREE.MeshBasicMaterial({
+  color: O, transparent: true, opacity: .4
+});
+const scanArc2 = new THREE.Mesh(scan2Geo, scan2Mat);
+gw.add(scanArc2);
 
-// Portal interior shader
+// ── Portal interior ──
 const pMat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false,
   uniforms:{uTime:{value:0}},
   vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1);}',
   fragmentShader:`uniform float uTime;varying vec2 vUv;void main(){vec2 p=vUv-.5;float d=length(p);float a=atan(p.y,p.x);float sw=sin(a*6.+d*20.-uTime*.8)*.5+.5;float rn=sin(d*40.-uTime*1.2)*.5+.5;float pt=sw*.4+rn*.6;float edge=smoothstep(.5,.42,d);float eG=smoothstep(.42,.5,d)*smoothstep(.52,.5,d)*3.;float ctr=smoothstep(.3,0.,d);vec3 c=vec3(1,.404,0);float al=pt*edge*.06+eG*.3+ctr*.02;al*=.8+.2*sin(uTime*.3);gl_FragColor=vec4(c*(.5+pt*.5),al);}`
 });
-const portal=new THREE.Mesh(new THREE.CircleGeometry(7.8,64),pMat);portal.position.z=.01;gw.add(portal);
+gw.add(new THREE.Mesh(new THREE.CircleGeometry(7.8,64),pMat));
 
 // ── Particle streams ──
 const PC=isMobile?800:2500;
@@ -139,7 +180,7 @@ pGeo.setAttribute('aSpeed',new THREE.BufferAttribute(pSp,1));
 pGeo.setAttribute('aRadius',new THREE.BufferAttribute(pRa,1));
 const pMat2=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
   uniforms:{uTime:{value:0}},
-  vertexShader:`attribute float aPhase,aSpeed,aRadius;uniform float uTime;varying float vA;void main(){vec3 pos=position;pos.z=mod(pos.z+uTime*aSpeed*3.+aPhase*20.,60.)-30.;float a2=atan(position.y,position.x)+uTime*.1*aSpeed;pos.x=cos(a2)*aRadius;pos.y=sin(a2)*aRadius;float pp=exp(-pos.z*pos.z*.005);pos.x*=1.-pp*.3;pos.y*=1.-pp*.3;vec4 mv=modelViewMatrix*vec4(pos,1);float dist=-mv.z;vA=(.15+pp*.5)*smoothstep(60.,5.,dist);gl_PointSize=max(1.,(1.+pp*2.5)*(20./max(dist,1.)));gl_Position=projectionMatrix*mv;}`,
+  vertexShader:'attribute float aPhase,aSpeed,aRadius;uniform float uTime;varying float vA;void main(){vec3 pos=position;pos.z=mod(pos.z+uTime*aSpeed*3.+aPhase*20.,60.)-30.;float a2=atan(position.y,position.x)+uTime*.1*aSpeed;pos.x=cos(a2)*aRadius;pos.y=sin(a2)*aRadius;float pp=exp(-pos.z*pos.z*.005);pos.x*=1.-pp*.3;pos.y*=1.-pp*.3;vec4 mv=modelViewMatrix*vec4(pos,1);float dist=-mv.z;vA=(.15+pp*.5)*smoothstep(60.,5.,dist);gl_PointSize=max(1.,(1.+pp*2.5)*(20./max(dist,1.)));gl_Position=projectionMatrix*mv;}',
   fragmentShader:'varying float vA;void main(){float d=length(gl_PointCoord-.5);gl_FragColor=vec4(1,.404,0,exp(-d*5.)*vA);}'
 });
 scene.add(new THREE.Points(pGeo,pMat2));
@@ -167,7 +208,7 @@ const rL=new THREE.DirectionalLight(O,.3);rL.position.set(0,10,-15);scene.add(rL
 const fL=new THREE.PointLight(O,1,30);fL.position.set(0,0,0);scene.add(fL);
 
 // ═══════════════════════════════════════════════════════════
-//  CAMERA STATE MACHINE — Exported to window for app.js
+//  CAMERA STATE MACHINE
 // ═══════════════════════════════════════════════════════════
 
 const states = {
@@ -201,47 +242,78 @@ window.co3Scene = {
   getState: function(){ return currentState; }
 };
 
-// ── Render loop ──
+// ═══════════════════════════════════════════════════════════
+//  ANIMATION LOOP — Dynamic ring behaviors
+// ═══════════════════════════════════════════════════════════
+
 const clock = new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(),.05);
   const t = clock.getElapsedTime();
 
-  // Update uniforms
+  // Uniforms
   sMat.uniforms.uTime.value=t;
   nMat.uniforms.uTime.value=t;
   pMat.uniforms.uTime.value=t;
   pMat2.uniforms.uTime.value=t;
   postMat.uniforms.uTime.value=t;
 
-  // Gateway rotation
-  gw.rotation.z += dt*.015;
+  // ── Dynamic ring animation ──
+  rings.forEach((ring, idx) => {
+    const u = ring.userData;
+
+    // Independent rotation per ring
+    if (u.axis === 'z') ring.rotation.z += u.rotSpeed;
+    else if (u.axis === 'x') ring.rotation.x += u.rotSpeed;
+
+    // Opacity breathing (wave from center outward)
+    if (u.breathAmp > 0) {
+      const wave = Math.sin(t * u.breathSpeed + u.phase * 1.5) * u.breathAmp;
+      ring.material.opacity = Math.max(0.02, u.baseOp * (1 + wave));
+    }
+
+    // Z-axis oscillation (rings drifting forward/back)
+    if (u.zOsc > 0) {
+      ring.position.z = Math.sin(t * 0.3 + u.phase * 2) * u.zOsc;
+    }
+  });
+
+  // ── Scanning arcs — continuous rotation ──
+  scanArc.rotation.z = t * 0.8;
+  scanMat.opacity = 0.4 + 0.3 * Math.sin(t * 1.2);
+
+  scanArc2.rotation.z = -t * 0.5;
+  scan2Mat.opacity = 0.2 + 0.2 * Math.sin(t * 0.8 + 1);
+
+  // Gateway base rotation (very slow)
+  gw.rotation.z += dt * .01;
 
   // Fill light pulse
-  fL.intensity = .8+.3*Math.sin(t*.4);
+  fL.intensity = .8 + .3 * Math.sin(t * .4);
 
-  // Camera — lerp toward target + orbit
+  // Camera lerp
   const lerpSpeed = transitioning ? 1.8 : 3.0;
   currentPos.lerp(targetPos, dt*lerpSpeed);
   currentLook.lerp(targetLook, dt*lerpSpeed);
 
-  // Orbital drift
   const s = states[currentState];
   if(s.orbit){
     orbitAngle += dt * s.orbitS;
-    const ox = Math.sin(orbitAngle) * s.orbitR;
-    const oy = Math.cos(orbitAngle*.7) * s.orbitH;
-    const oz = Math.sin(orbitAngle*.3) * (s.orbitR*.5);
-    camera.position.set(currentPos.x+ox, currentPos.y+oy, currentPos.z+oz);
+    camera.position.set(
+      currentPos.x + Math.sin(orbitAngle)*s.orbitR,
+      currentPos.y + Math.cos(orbitAngle*.7)*s.orbitH,
+      currentPos.z + Math.sin(orbitAngle*.3)*(s.orbitR*.5)
+    );
   } else {
     camera.position.copy(currentPos);
   }
 
-  // Look with breathing
-  const bx = Math.sin(t*.15)*.3;
-  const by = Math.cos(t*.1)*.2;
-  camera.lookAt(currentLook.x+bx, currentLook.y+by, currentLook.z);
+  camera.lookAt(
+    currentLook.x + Math.sin(t*.15)*.3,
+    currentLook.y + Math.cos(t*.1)*.2,
+    currentLook.z
+  );
 
   // Render pipeline
   renderer.setRenderTarget(rt);

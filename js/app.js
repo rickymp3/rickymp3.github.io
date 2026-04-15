@@ -28,6 +28,10 @@ function navigateTo(idx){
   // Move camera
   if(window.co3Scene) window.co3Scene.setState(name);
 
+  // Scene color theme (miji gold on product page)
+  const sceneEl = document.getElementById('scene-container');
+  if(sceneEl) sceneEl.classList.toggle('theme-miji', name==='product');
+
   // Update nav
   document.querySelectorAll('nav a').forEach(a=>{
     a.classList.toggle('active', a.dataset.page===name);
