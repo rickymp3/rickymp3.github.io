@@ -170,9 +170,30 @@ nav a.active::after{width:100%;left:0}
 .miji-verse::before{
   background:linear-gradient(135deg,rgba(196,162,101,.04) 0%,transparent 50%,rgba(196,162,101,.015) 100%);
 }
-.m-greeting{font-family:var(--fm);font-weight:300;font-size:clamp(1.3rem,2.5vw,1.8rem);color:var(--t);text-transform:lowercase;margin-bottom:.2rem}
-.m-tagline{font-family:var(--fm);font-weight:300;font-size:.7rem;color:var(--gold);text-transform:lowercase;letter-spacing:.08em;margin-bottom:1rem;opacity:.7}
-.m-desc{font-family:var(--fm);font-weight:300;font-size:.78rem;color:var(--t-s);line-height:1.85;max-width:400px;margin:0 auto 1.4rem}
+.m-greeting,.m-tagline,.m-desc{display:none} /* deprecated */
+
+/* Miji hero — exact miji.one rendering */
+.miji-hero{text-align:center;margin-bottom:1.2rem}
+.miji-orb-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+#miji-orb{width:120px;height:120px;border-radius:50%}
+.miji-tagline{
+  font-family:var(--fm);font-size:2.4rem;font-weight:300;
+  letter-spacing:-.02em;line-height:1.15;color:#F5F5F8;
+  margin-bottom:16px;
+}
+.miji-line1,.miji-line2{display:block}
+.miji-line2{color:#C4A265}
+.miji-subtitle{
+  font-family:var(--fm);font-size:1.4rem;font-weight:300;
+  letter-spacing:-.015em;line-height:1.25;color:#F0F0F4;
+  margin-bottom:16px;
+}
+.miji-subtitle-line{display:block}
+.miji-desc{
+  font-family:var(--fm);font-size:.78rem;font-weight:300;
+  color:rgba(232,232,236,.6);line-height:1.7;
+  max-width:400px;margin:0 auto;
+}
 .m-link{font-family:var(--fm);font-weight:300;font-size:.78rem;letter-spacing:.1em;text-transform:lowercase;color:var(--gold);display:inline-flex;align-items:center;gap:.5rem}
 .m-link:hover{color:var(--gold-d);opacity:1}
 .m-link .arr{display:inline-block;transition:transform .3s}

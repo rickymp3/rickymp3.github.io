@@ -1,6 +1,59 @@
 (function(){
 'use strict';
 function rand(min,max){return Math.random()*(max-min)+min}
+function lerp(a,b,t){return a+(b-a)*t}
+const GOLD={r:196,g:162,b:101};
+
+// Hero orb — exact miji.one rendering
+function createOrb(canvas,size){
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=size*dpr;canvas.height=size*dpr;
+  canvas.style.width=size+'px';canvas.style.height=size+'px';
+  ctx.scale(dpr,dpr);
+  const cx=size/2,cy=size/2,baseR=size*0.34;
+  let t=rand(0,1000);
+  function draw(){
+    t+=0.014;
+    ctx.clearRect(0,0,size,size);
+    const pulse=0.75+Math.sin(t*0.55)*0.25;
+    const glowR=baseR*(1.7+Math.sin(t*0.55)*0.25);
+    const glow=ctx.createRadialGradient(cx,cy,baseR*0.5,cx,cy,glowR);
+    glow.addColorStop(0,`rgba(${GOLD.r},${GOLD.g},${GOLD.b},${0.14*pulse})`);
+    glow.addColorStop(0.5,`rgba(${GOLD.r},${GOLD.g},${GOLD.b},${0.05*pulse})`);
+    glow.addColorStop(1,'rgba(8,8,15,0)');
+    ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);
+    for(let i=5;i>=0;i--){
+      const frac=i/5;
+      const r=baseR*(0.4+frac*0.6)*(0.94+pulse*0.06);
+      const ox=Math.sin(t+i*1.2)*baseR*0.09;
+      const oy=Math.cos(t*0.8+i*0.9)*baseR*0.09;
+      const alpha=lerp(0.55,0.1,frac)*pulse;
+      const cR=Math.round(lerp(GOLD.r,GOLD.r*0.6,frac));
+      const cG=Math.round(lerp(GOLD.g,GOLD.g*0.5,frac));
+      const cB=Math.round(lerp(GOLD.b,GOLD.b*0.4,frac));
+      const grad=ctx.createRadialGradient(cx+ox,cy+oy,0,cx+ox,cy+oy,r);
+      grad.addColorStop(0,`rgba(${cR},${cG},${cB},${alpha})`);
+      grad.addColorStop(1,`rgba(${cR},${cG},${cB},0)`);
+      ctx.beginPath();ctx.arc(cx+ox,cy+oy,r,0,Math.PI*2);
+      ctx.fillStyle=grad;ctx.fill();
+    }
+    const coreA=(0.4+Math.sin(t*1.8)*0.15)*pulse;
+    const coreG=ctx.createRadialGradient(cx,cy,0,cx,cy,baseR*0.25);
+    coreG.addColorStop(0,`rgba(255,240,210,${coreA})`);
+    coreG.addColorStop(1,'rgba(196,162,101,0)');
+    ctx.beginPath();ctx.arc(cx,cy,baseR*0.3,0,Math.PI*2);
+    ctx.fillStyle=coreG;ctx.fill();
+    const ringR=baseR*(0.82+Math.sin(t*0.7)*0.12);
+    ctx.beginPath();ctx.arc(cx,cy,ringR,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(${GOLD.r},${GOLD.g},${GOLD.b},${(0.12+Math.sin(t)*0.07)*pulse})`;
+    ctx.lineWidth=0.8;ctx.stroke();
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// Scorecard canvas
 const moodPalettes={
   low:{c1:[90,60,100],c2:[50,50,80],c3:[70,40,60]},
   mid:{c1:[120,120,80],c2:[80,100,120],c3:[100,80,90]},
@@ -54,6 +107,12 @@ function initCard(){
   }
   draw();
 }
-if(document.readyState==='complete')initCard();
-else window.addEventListener('load',initCard);
+
+function init(){
+  const orb=document.getElementById('miji-orb');
+  if(orb) createOrb(orb,120);
+  initCard();
+}
+if(document.readyState==='complete')init();
+else window.addEventListener('load',init);
 })();
