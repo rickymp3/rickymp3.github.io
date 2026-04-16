@@ -382,11 +382,11 @@ nav a.active::after{width:100%;left:0}
   .page-inner{padding:.8rem;border-radius:8px}
   /* All content text uniform */
   .r-label,.r-title,.r-desc{font-size:.58rem}
-  .r-grid{grid-template-columns:1fr;padding:0 .3rem;gap:.4rem;max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  #research .page-inner{padding:.6rem .7rem}
-  /* Contact compact — no scroll */
-  .c-duo{grid-template-columns:1fr;padding:0 .3rem;gap:.4rem}
-  #contact .page-inner{padding:.6rem .7rem}
+  .r-grid{grid-template-columns:1fr;padding:0;gap:.4rem;max-height:75vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  #research .page-inner{padding:.8rem}
+  /* Contact compact */
+  .c-duo{padding:0;gap:.4rem}
+  #contact .page-inner{padding:.8rem}
   .c-heading{font-size:.58rem;margin-bottom:.35rem}
   .c-field{margin-bottom:.4rem}
   .c-field label{display:none}
