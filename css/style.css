@@ -310,7 +310,7 @@ nav a.active::after{width:100%;left:0}
   max-width:520px;width:100%;padding:0 clamp(1rem,3vw,2rem);
 }
 #contact{align-items:center}
-#contact .page-inner{text-align:left;max-width:none;width:auto}
+#contact .page-inner{text-align:left;max-width:none;width:auto;padding:clamp(1.2rem,2.5vw,2rem)}
 .c-duo .rv:nth-child(2){transition-delay:.7s}
 .c-heading{
   font-family:var(--fd);font-weight:300;font-size:.82rem;
