@@ -285,9 +285,8 @@ nav a.active::after{width:100%;left:0}
 
 /* ═══════════ Contact ═══════════ */
 .c-duo{
-  display:grid;grid-template-columns:1fr 1fr;gap:.6rem;
-  max-width:820px;width:100%;padding:0 clamp(1rem,3vw,2rem);
-  align-items:start;
+  display:flex;flex-direction:column;gap:.6rem;
+  max-width:520px;width:100%;padding:0 clamp(1rem,3vw,2rem);
 }
 #contact{align-items:center}
 #contact .page-inner{text-align:left;max-width:none;width:auto}
@@ -332,13 +331,13 @@ nav a.active::after{width:100%;left:0}
 .c-submit button:hover{background:rgba(255,103,0,.12);border-color:var(--o)}
 
 .c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em}
-.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block}
+.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block;margin-bottom:.8rem}
 .c-addresses{margin-top:.8rem}
 .c-addr-block{margin-bottom:.8rem}
 .c-addr-block:last-child{margin-bottom:0}
 .c-addr-label{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.3rem}
 .c-addr-text{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);line-height:1.7}
-.c-socials{display:flex;gap:1rem;margin-top:.6rem;align-items:center;justify-content:center}
+.c-socials{display:flex;gap:1rem;margin-top:.8rem;align-items:center;justify-content:center}
 .c-socials a{color:var(--t-d);display:flex;transition:color .3s}
 .c-socials a:hover{color:var(--t-s);opacity:1}
 
