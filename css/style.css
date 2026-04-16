@@ -351,9 +351,9 @@ nav a.active::after{width:100%;left:0}
 }
 .c-submit button:hover{background:rgba(255,103,0,.12);border-color:var(--o)}
 
-.c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em;margin-top:.8rem}
-.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block}
-.c-addresses{margin-top:.8rem}
+.c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em}
+.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);display:block;margin-top:.8rem;margin-bottom:.15rem}
+.c-addresses{margin-top:0}
 .c-addr-block{margin-bottom:.8rem}
 .c-addr-block:last-child{margin-bottom:0}
 .c-addr-label{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.3rem}
@@ -415,7 +415,6 @@ nav a.active::after{width:100%;left:0}
   .c-submit{margin-top:.1rem}
   .c-submit button{padding:.4rem 1.2rem;font-size:.58rem;border-radius:6px}
   .c-phone,.c-phone-tag,.c-addr-label,.c-addr-text{font-size:.58rem}
-  .c-phone{margin-top:.5rem}
   .c-addr-label{margin-bottom:.1rem}
   .c-addr-text{line-height:1.4}
   .c-socials{gap:.6rem;margin-top:.4rem}
