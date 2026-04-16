@@ -7,7 +7,7 @@
 
 const pages = ['home','research','product','contact'];
 let cur = 0, locked = false;
-const LOCK = 2000;
+const LOCK = 2500;
 const tagline = document.querySelector('.tagline');
 const heroLogo = document.querySelector('.hero-logo');
 const swipeHint = document.getElementById('swipeHint');
@@ -27,7 +27,7 @@ function go(idx) {
 
   // Transition flash
   const flash = document.querySelector('.transition-flash');
-  if (flash) { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 250); }
+  if (flash) { flash.classList.add('active'); setTimeout(() => flash.classList.remove('active'), 400); }
 
   // Camera + color
   if (window.co3Scene) window.co3Scene.setState(name);
@@ -48,7 +48,7 @@ function go(idx) {
   setTimeout(() => {
     const el = document.getElementById(name);
     if (el) el.classList.add('active');
-  }, name === 'home' ? 300 : 500);
+  }, name === 'home' ? 500 : 700);
 
   // URL
   history.replaceState(null, null, name === 'home' ? '#' : '#' + name);
