@@ -10,16 +10,12 @@ let cur = 0, locked = false;
 const LOCK = 2500;
 const tagline = document.querySelector('.tagline');
 const heroLogo = document.querySelector('.hero-logo');
-const swipeHint = document.getElementById('swipeHint');
 
 function go(idx) {
   if (locked || idx === cur || idx < 0 || idx >= pages.length) return;
   locked = true;
   const name = pages[idx];
   const isHome = name === 'home';
-
-  // Hide swipe hint on first navigation
-  if (swipeHint) swipeHint.classList.add('hidden');
 
   // Deactivate current page
   const prevEl = document.getElementById(pages[cur]);
@@ -80,15 +76,6 @@ document.addEventListener('wheel', e => {
   if (Math.abs(wA) > 80) { go(cur + (wA > 0 ? 1 : -1)); wA = 0; }
 }, { passive: false });
 
-// Touch
-let tx = 0, ty = 0;
-document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
-document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
-  if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 60) go(cur + (dy < 0 ? 1 : -1));
-  else if (Math.abs(dx) > 60) go(cur + (dx < 0 ? 1 : -1));
-}, { passive: true });
-
 // Select helper
 document.querySelectorAll('.c-field select').forEach(sel =>
   sel.addEventListener('change', () => sel.classList.toggle('has-value', sel.value !== ''))
@@ -105,7 +92,6 @@ function init() {
     document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.dataset.page === pages[i]));
     if (tagline) tagline.classList.remove('visible');
     if (heroLogo) heroLogo.classList.remove('visible');
-    if (swipeHint) swipeHint.classList.add('hidden');
   } else {
     document.getElementById('home').classList.add('active');
     document.querySelector('nav a[data-page="home"]').classList.add('active');

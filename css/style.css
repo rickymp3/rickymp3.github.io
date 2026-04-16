@@ -331,11 +331,19 @@ nav a.active::after{width:100%;left:0}
 .c-submit button:hover{background:rgba(255,103,0,.12);border-color:var(--o)}
 
 .c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em}
-.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block;margin-bottom:1rem}
-.c-addresses{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block}
+.c-info-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:.6rem;
+  width:100%;
+}
+.c-phone-panel{grid-column:1/-1;text-align:center}
+.c-phone-panel .c-phone-tag{margin-bottom:.6rem}
+.c-info-grid .rv:nth-child(1){transition-delay:.7s}
+.c-info-grid .rv:nth-child(2){transition-delay:.85s}
+.c-info-grid .rv:nth-child(3){transition-delay:1s}
 .c-addr-label{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.3rem}
 .c-addr-text{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);line-height:1.7}
-.c-socials{display:flex;gap:1rem;margin-top:clamp(1rem,2.5vh,1.5rem);align-items:center;justify-content:center}
+.c-socials{display:flex;gap:1rem;margin-top:.6rem;align-items:center;justify-content:center}
 .c-socials a{color:var(--t-d);display:flex;transition:color .3s}
 .c-socials a:hover{color:var(--t-s);opacity:1}
 
@@ -354,35 +362,10 @@ nav a.active::after{width:100%;left:0}
 }
 .transition-flash.active{opacity:.5}
 
-/* ═══════════ Swipe hint (mobile only) ═══════════ */
-.swipe-hint{
-  position:fixed;z-index:99;
-  bottom:calc(clamp(1.5rem,4vh,3rem) + 3rem);
-  left:50%;transform:translateX(-50%);
-  display:none;flex-direction:column;align-items:center;gap:.3rem;
-  pointer-events:none;
-  opacity:0;
-  animation:hintIn .8s ease 1.5s forwards,hintOut .8s ease 5s forwards;
-}
-.swipe-hint.hidden{display:none !important}
-.swipe-hint-text{
-  font-family:var(--fd);font-weight:300;font-size:.45rem;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--t-m);
-}
-.swipe-hint-arrows{
-  color:var(--t-m);
-  transform:rotate(90deg);
-  animation:hintPulse 2s ease-in-out infinite 1.5s;
-}
-@keyframes hintIn{to{opacity:1}}
-@keyframes hintOut{to{opacity:0;visibility:hidden}}
-@keyframes hintPulse{0%,100%{transform:rotate(90deg) translateY(0)}50%{transform:rotate(90deg) translateY(3px)}}
-
 /* ═══════════ Responsive ═══════════ */
 
 /* Tablet */
 @media(max-width:768px){
-  .swipe-hint{display:flex}
   nav{bottom:1rem;gap:1rem;padding:.45rem 1rem}
   nav a{padding:.6rem .2rem;min-height:44px;display:flex;align-items:center}
   .page-inner{
@@ -390,7 +373,7 @@ nav a.active::after{width:100%;left:0}
     max-height:70vh;overflow-y:auto;
     -webkit-overflow-scrolling:touch;
   }
-  .c-addresses{grid-template-columns:1fr;gap:1rem}
+  .c-info-grid{grid-template-columns:1fr;gap:.6rem}
   .footer{display:none}
   .hero-logo{width:clamp(160px,30vmin,260px)}
   .c-layout{padding:0 1rem}
@@ -419,7 +402,7 @@ nav a.active::after{width:100%;left:0}
   .c-submit button{padding:.4rem 1.2rem;font-size:.58rem;border-radius:6px}
   .c-phone,.c-phone-tag,.c-addr-label,.c-addr-text{font-size:.58rem}
   .c-phone-tag{margin-bottom:.35rem}
-  .c-addresses{gap:.5rem}
+  .c-info-grid{grid-template-columns:1fr;gap:.3rem}
   .c-addr-label{margin-bottom:.1rem}
   .c-addr-text{line-height:1.4}
   .c-socials{gap:.6rem;margin-top:.4rem}
