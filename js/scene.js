@@ -151,15 +151,15 @@ S.add(wormhole);
 // ═══════════════════════════════════ CAMERA ═══════════════════════════════════
 
 const states = {
-  home:     { pos: [0, 14, 14],    look: [0, -1, 0],   oR: 2.5, oH: 1,   oS: 0.02 },
-  product:  { pos: [12, 10, 12],   look: [0, -1, 0],   oR: 1.5, oH: 0.8, oS: 0.015 },
-  research: { pos: [-5, 16, 8],    look: [0, -1, 0],   oR: 1.5, oH: 0.6, oS: 0.018 },
-  contact:  { pos: [-12, 10, 12],  look: [0, -1, 0],   oR: 1.5, oH: 0.8, oS: 0.015 }
+  home:     { pos: [-5, 16, 8],    look: [0, -1, 0],   oR: 2.0, oH: 0.8, oS: 0.015 },
+  research: { pos: [0, 22, 3],     look: [0, -2, 0],   oR: 1.0, oH: 0.3, oS: 0.012 },
+  product:  { pos: [8, 6, 16],     look: [0, -1, 0],   oR: 1.8, oH: 0.6, oS: 0.018 },
+  contact:  { pos: [-14, 18, -6],  look: [0, -1, 0],   oR: 2.2, oH: 1.0, oS: 0.01  }
 };
 
 let curSt = 'home';
-let tPos = new THREE.Vector3(0, 14, 14), tLook = new THREE.Vector3(0, -1, 0);
-let cPos = new THREE.Vector3(0, 14, 14), cLook = new THREE.Vector3(0, -1, 0);
+let tPos = new THREE.Vector3(-5, 16, 8), tLook = new THREE.Vector3(0, -1, 0);
+let cPos = new THREE.Vector3(-5, 16, 8), cLook = new THREE.Vector3(0, -1, 0);
 let oA = 0, trans = false;
 cam.position.copy(cPos); cam.lookAt(cLook);
 
