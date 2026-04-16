@@ -118,7 +118,7 @@ nav::before{
 }
 nav a{
   font-family:var(--fd);font-weight:300;
-  font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;
+  font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;
   color:var(--t-m);transition:color .4s;padding:.5rem 0;position:relative;
 }
 nav a::after{
@@ -173,8 +173,8 @@ nav a.active::after{width:100%;left:0}
 }
 .m-greeting{font-family:var(--fm);font-weight:300;font-size:clamp(1.3rem,2.5vw,1.8rem);color:var(--t);text-transform:lowercase;margin-bottom:.2rem}
 .m-tagline{font-family:var(--fm);font-weight:300;font-size:.7rem;color:var(--gold);text-transform:lowercase;letter-spacing:.08em;margin-bottom:1rem;opacity:.7}
-.m-desc{font-family:var(--fm);font-weight:300;font-size:.68rem;color:var(--t-s);line-height:1.85;max-width:400px;margin:0 auto 1.4rem}
-.m-link{font-family:var(--fm);font-weight:300;font-size:.68rem;letter-spacing:.1em;text-transform:lowercase;color:var(--gold);display:inline-flex;align-items:center;gap:.5rem}
+.m-desc{font-family:var(--fm);font-weight:300;font-size:.78rem;color:var(--t-s);line-height:1.85;max-width:400px;margin:0 auto 1.4rem}
+.m-link{font-family:var(--fm);font-weight:300;font-size:.78rem;letter-spacing:.1em;text-transform:lowercase;color:var(--gold);display:inline-flex;align-items:center;gap:.5rem}
 .m-link:hover{color:var(--gold-d);opacity:1}
 .m-link .arr{display:inline-block;transition:transform .3s}
 .m-link:hover .arr{transform:translateX(4px)}
@@ -265,12 +265,12 @@ nav a.active::after{width:100%;left:0}
 
 /* ═══════════ Research ═══════════ */
 #research .page-inner{text-align:left}
-.r-label{font-family:var(--fd);font-weight:300;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.2rem}
-.r-title{font-family:var(--fd);font-weight:300;font-size:.72rem;color:var(--t);letter-spacing:.15em;text-transform:uppercase}
-.r-desc{font-family:var(--fd);font-weight:300;font-size:.72rem;color:var(--t-s);line-height:1.75;margin-top:.2rem}
-.r-item{margin-bottom:clamp(1.3rem,2.5vh,2rem)}
-.r-div{width:16px;height:1px;background:var(--o-dim);margin:0 auto clamp(1.3rem,2.5vh,2rem)}
-.r-link{font-family:var(--fd);font-weight:300;font-size:.72rem;letter-spacing:.15em;text-transform:lowercase;color:var(--o);display:inline-flex;align-items:center;gap:.5rem;margin-top:.5rem}
+.r-label{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.2rem}
+.r-title{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t);letter-spacing:.15em;text-transform:uppercase}
+.r-desc{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);line-height:1.75;margin-top:.2rem}
+.r-item{margin-bottom:clamp(.8rem,1.5vh,1.2rem)}
+.r-div{width:16px;height:1px;background:var(--o-dim);margin:0 auto clamp(.8rem,1.5vh,1.2rem)}
+.r-link{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:lowercase;color:var(--o);display:inline-flex;align-items:center;gap:.5rem;margin-top:.5rem}
 .r-link:hover{opacity:.7}
 .r-link .arr{display:inline-block;transition:transform .3s}
 .r-link:hover .arr{transform:translateX(4px)}
@@ -283,7 +283,7 @@ nav a.active::after{width:100%;left:0}
 #contact{align-items:center}
 #contact .page-inner{text-align:left;max-width:none;width:100%}
 .c-heading{
-  font-family:var(--fd);font-weight:300;font-size:.72rem;
+  font-family:var(--fd);font-weight:300;font-size:.82rem;
   letter-spacing:.15em;text-transform:uppercase;color:var(--t);
   margin-bottom:clamp(1rem,2.5vh,1.5rem);
 }
@@ -293,7 +293,7 @@ nav a.active::after{width:100%;left:0}
   width:100%;
   background:rgba(255,255,255,.025);
   border:1px solid rgba(255,255,255,.1);
-  color:var(--t);font-family:var(--fd);font-size:.72rem;
+  color:var(--t);font-family:var(--fd);font-size:.82rem;
   padding:.6rem .8rem;outline:none;border-radius:8px;
   -webkit-appearance:none;appearance:none;
   transition:border-color .4s,background .4s;
@@ -303,7 +303,7 @@ nav a.active::after{width:100%;left:0}
 }
 .c-field input::placeholder,.c-field textarea::placeholder{color:var(--t-m)}
 .c-field label{
-  display:block;font-family:var(--fd);font-weight:300;font-size:.72rem;
+  display:block;font-family:var(--fd);font-weight:300;font-size:.82rem;
   letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);
   margin-bottom:.4rem;
 }
@@ -313,7 +313,7 @@ nav a.active::after{width:100%;left:0}
 .c-field select option{background:var(--bg-s);color:var(--t)}
 .c-submit{margin-top:.3rem}
 .c-submit button{
-  font-family:var(--fd);font-weight:300;font-size:.72rem;
+  font-family:var(--fd);font-weight:300;font-size:.82rem;
   letter-spacing:.2em;text-transform:uppercase;
   background:rgba(255,103,0,.06);border:1px solid rgba(255,103,0,.25);
   color:var(--o);padding:.65rem 2rem;cursor:pointer;border-radius:8px;
@@ -321,11 +321,11 @@ nav a.active::after{width:100%;left:0}
 }
 .c-submit button:hover{background:rgba(255,103,0,.12);border-color:var(--o)}
 
-.c-phone{font-family:var(--fd);font-weight:300;font-size:.72rem;color:var(--t-s);letter-spacing:.06em}
-.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block;margin-bottom:1rem}
+.c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em}
+.c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--t-d);margin-top:.1rem;display:block;margin-bottom:1rem}
 .c-addresses{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.c-addr-label{font-family:var(--fd);font-weight:300;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.3rem}
-.c-addr-text{font-family:var(--fd);font-weight:300;font-size:.72rem;color:var(--t-s);line-height:1.7}
+.c-addr-label{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);margin-bottom:.3rem}
+.c-addr-text{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);line-height:1.7}
 .c-socials{display:flex;gap:1rem;margin-top:clamp(1rem,2.5vh,1.5rem);align-items:center}
 .c-socials a{color:var(--t-d);display:flex;transition:color .3s}
 .c-socials a:hover{color:var(--t-s);opacity:1}
