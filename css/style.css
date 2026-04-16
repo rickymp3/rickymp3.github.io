@@ -352,6 +352,7 @@ nav a.active::after{width:100%;left:0}
 .c-submit button:hover{background:rgba(255,103,0,.12);border-color:var(--o)}
 
 .c-phone{font-family:var(--fd);font-weight:300;font-size:.82rem;color:var(--t-s);letter-spacing:.06em}
+.c-phone a{color:inherit;text-decoration:none}
 .c-phone-tag{font-family:var(--fd);font-weight:300;font-size:.82rem;letter-spacing:.15em;text-transform:uppercase;color:var(--o);display:block;margin-top:.8rem;margin-bottom:.15rem}
 .c-addresses{margin-top:0}
 .c-addr-block{margin-bottom:.8rem}
