@@ -68,13 +68,52 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Escape') go(0);
 });
 
-// Wheel
+// Wheel — scroll within panels first, page-transition only at edges
 let wA = 0;
 document.addEventListener('wheel', e => {
+  // Check if a scrollable container exists on active page
+  const active = document.querySelector('.page.active');
+  if (active) {
+    const sc = active.querySelector('.r-grid, .c-duo, .miji-verse');
+    if (sc && sc.scrollHeight > sc.clientHeight) {
+      const atTop = sc.scrollTop <= 0;
+      const atBot = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2;
+      if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBot)) {
+        wA = 0;
+        return; // let scroll happen naturally
+      }
+    }
+  }
   e.preventDefault();
   wA += e.deltaY;
   if (Math.abs(wA) > 80) { go(cur + (wA > 0 ? 1 : -1)); wA = 0; }
 }, { passive: false });
+
+// Touch swipe — allow scroll within panels
+let tY = 0;
+document.addEventListener('touchstart', e => { tY = e.touches[0].clientY; }, { passive: true });
+document.addEventListener('touchmove', e => {
+  const active = document.querySelector('.page.active');
+  if (active) {
+    const sc = active.querySelector('.r-grid, .c-duo, .miji-verse');
+    if (sc && sc.scrollHeight > sc.clientHeight) return; // allow native scroll
+  }
+  e.preventDefault();
+}, { passive: false });
+document.addEventListener('touchend', e => {
+  const active = document.querySelector('.page.active');
+  if (active) {
+    const sc = active.querySelector('.r-grid, .c-duo, .miji-verse');
+    if (sc && sc.scrollHeight > sc.clientHeight) {
+      const atTop = sc.scrollTop <= 0;
+      const atBot = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2;
+      const dy = tY - e.changedTouches[0].clientY;
+      if ((dy < 0 && !atTop) || (dy > 0 && !atBot)) return;
+    }
+  }
+  const dy = tY - e.changedTouches[0].clientY;
+  if (Math.abs(dy) > 40) go(cur + (dy > 0 ? 1 : -1));
+}, { passive: true });
 
 // Select helper
 document.querySelectorAll('.c-field select').forEach(sel =>
