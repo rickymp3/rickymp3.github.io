@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="138" height="20" role="img" aria-label="miji: Learn More">
+  <title>miji: Learn More</title>
+  <linearGradient id="ms" x2="0" y2="100%">
+    <stop offset="0" stop-color="#222" stop-opacity=".2"/>
+    <stop offset="1" stop-opacity=".15"/>
+  </linearGradient>
+  <radialGradient id="orb" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#F5E0B0"/>
+    <stop offset="45%" stop-color="#C4A265"/>
+    <stop offset="100%" stop-color="#8B7040" stop-opacity="0"/>
+  </radialGradient>
+  <clipPath id="mr">
+    <rect width="138" height="20" rx="3" fill="#fff"/>
+  </clipPath>
+  <g clip-path="url(#mr)">
+    <rect width="62" height="20" fill="#1a1a1a"/>
+    <rect x="62" width="76" height="20" fill="#2a2a2a"/>
+    <rect width="138" height="20" fill="url(#ms)"/>
+  </g>
+  <circle cx="13" cy="10" r="5" fill="url(#orb)"/>
+  <g fill="#C4A265" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+    <text x="22" y="14">miji</text>
+  </g>
+  <g fill="#ccc" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+    <text x="69" y="14">Learn More</text>
+  </g>
+</svg>
