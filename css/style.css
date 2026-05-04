@@ -310,7 +310,7 @@ nav a.active::after{width:100%;left:0}
 .r-link:hover{opacity:.7}
 .r-link .arr{display:inline-block;transition:transform .3s}
 .r-link:hover .arr{transform:translateX(4px)}
-.r-badge{display:block;margin-top:.5rem;text-align:center}
+.r-badge{display:block;margin-top:.8rem;text-align:center}
 .r-badge img{height:20px;display:inline-block}
 .r-badge:hover{opacity:.8;transition:opacity .3s}
 
