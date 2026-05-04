@@ -166,6 +166,7 @@ nav a.active::after{width:100%;left:0}
   background:rgba(8,8,15,.55);
   border-color:rgba(196,162,101,.1);
   text-align:center;
+  display:flex;flex-direction:column;
   max-height:calc(100vh - 8rem);overflow-y:auto;
   scrollbar-width:none;
 }
@@ -296,7 +297,7 @@ nav a.active::after{width:100%;left:0}
 }
 .r-grid::-webkit-scrollbar{display:none}
 #research{align-items:center}
-#research .page-inner{text-align:left;max-width:none;width:auto;padding:clamp(1rem,2vw,1.5rem)}
+#research .page-inner{text-align:left;max-width:none;width:auto;padding:clamp(1rem,2vw,1.5rem);display:flex;flex-direction:column}
 .r-wide{grid-column:1/-1}
 .r-grid .rv:nth-child(1){transition-delay:.5s}
 .r-grid .rv:nth-child(2){transition-delay:.65s}
@@ -310,7 +311,7 @@ nav a.active::after{width:100%;left:0}
 .r-link:hover{opacity:.7}
 .r-link .arr{display:inline-block;transition:transform .3s}
 .r-link:hover .arr{transform:translateX(4px)}
-.r-badge{display:block;margin-top:.8rem;text-align:center}
+.r-badge{display:block;margin-top:auto;padding-top:.8rem;text-align:center}
 .r-badge img{height:20px;display:inline-block}
 .r-badge:hover{opacity:.8;transition:opacity .3s}
 
